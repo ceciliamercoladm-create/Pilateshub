@@ -3,17 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PilatesHub · Tu estudio</title>
+<title>PilatesHub · Gestión de tu estudio</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F5F5F0;color:#1a1a1a;font-size:14px}
+.hidden{display:none!important}
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.auth-box{background:#fff;border-radius:16px;border:1px solid #e5e5e0;padding:2rem;width:100%;max-width:380px}
+.auth-logo{font-size:22px;font-weight:500;text-align:center;margin-bottom:0.25rem}.auth-logo span{color:#0F6E56}
+.auth-sub{font-size:13px;color:#888;text-align:center;margin-bottom:1.5rem}
+.auth-tabs{display:flex;gap:4px;background:#F5F5F0;border-radius:8px;padding:3px;margin-bottom:1.5rem}
+.auth-tab{flex:1;font-size:12px;padding:6px;border:none;background:transparent;border-radius:6px;cursor:pointer;font-family:inherit;color:#666}
+.auth-tab.active{background:#fff;color:#1a1a1a;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.form-group{margin-bottom:0.875rem}
+.form-label{font-size:12px;color:#666;margin-bottom:4px;display:block}
+.form-group input{width:100%;font-size:13px;padding:9px 11px;border:1px solid #e0e0e0;border-radius:8px;font-family:inherit;background:#fff;color:#1a1a1a;outline:none}
+.form-group input:focus{border-color:#5DCAA5}
+.btn-primary{background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;width:100%;margin-top:0.25rem}
+.btn-primary:hover{background:#0a5040}
+.btn-link{background:none;border:none;color:#0F6E56;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;margin-top:0.75rem;display:block;text-align:center}
+.auth-error{background:#FCEBEB;color:#791F1F;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:0.875rem;display:none}
+.auth-success{background:#E1F5EE;color:#085041;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:0.875rem;display:none}
+/* APP */
 .topbar{background:#fff;border-bottom:1px solid #e5e5e0;padding:0 1.5rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .logo{font-size:16px;font-weight:500}.logo span{color:#0F6E56}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.centro-name{font-size:12px;color:#888}
+.btn-logout{font-size:11px;padding:4px 10px;border:1px solid #e5e5e0;border-radius:8px;background:#fff;color:#666;cursor:pointer;font-family:inherit}
 .nav{display:flex;gap:4px;background:#F5F5F0;border-radius:8px;padding:3px}
 .nav-btn{font-size:12px;padding:5px 12px;border:none;background:transparent;border-radius:6px;cursor:pointer;color:#666;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;gap:5px}
 .nav-btn.active{background:#fff;color:#1a1a1a;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
-.main{max-width:800px;margin:0 auto;padding:1.5rem}
+.main{max-width:820px;margin:0 auto;padding:1.5rem}
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
 .met{background:#fff;border-radius:10px;padding:1rem;text-align:center;border:1px solid #e5e5e0}
 .met-n{font-size:22px;font-weight:500}.met-l{font-size:11px;color:#888;margin-top:2px}
@@ -22,54 +45,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .day-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
 .day-tab{font-size:12px;padding:5px 14px;border:1px solid #e0e0e0;border-radius:20px;cursor:pointer;background:#fff;color:#666;font-family:inherit}
 .day-tab.active{background:#E1F5EE;color:#085041;border-color:#5DCAA5;font-weight:500}
-.day-tab.friday{border-color:#AFA9EC}.day-tab.friday.active{background:#EEEDFE;color:#3C3489;border-color:#7F77DD;font-weight:500}
 .slots{display:flex;flex-direction:column;gap:10px}
 .slot{background:#fff;border:1px solid #e5e5e0;border-radius:12px;padding:1rem}
 .slot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .slot-time{font-size:14px;font-weight:500;display:flex;align-items:center;gap:5px}
-.slot-type{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500}
-.st-reformer{background:#E1F5EE;color:#085041}.st-reset{background:#EEEDFE;color:#3C3489}.st-yoga{background:#FAEEDA;color:#633806}
+.slot-type{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500;color:#fff}
 .cupos-bar{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
-.cupo{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:1px solid #e0e0e0;cursor:pointer}
-.cupo.libre{background:#F5F5F0;color:#aaa}.cupo.ocupado{background:#E1F5EE;color:#085041;border-color:#5DCAA5}.cupo.ocupado-v{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
+.cupo{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:1px solid #e0e0e0}
+.cupo.libre{background:#F5F5F0;color:#aaa}.cupo.ocupado{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
 .cupo-label{font-size:11px;color:#888;margin-left:4px}
 .alumnas-list{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-.alumna-chip{font-size:11px;padding:3px 9px;border-radius:12px;background:#F5F5F0;color:#555;cursor:pointer;border:1px solid #e5e5e0}
-.alumna-chip.asistio{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
-.alumna-chip.ausente{background:#FCEBEB;color:#791F1F;border-color:#F09595}
+.alumna-chip{font-size:11px;padding:3px 9px;border-radius:12px;background:#F5F5F0;color:#555;border:1px solid #e5e5e0}
 .slot-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid #f0f0f0}
 .libre-count{font-size:12px;color:#888}.libre-count span{font-weight:500;color:#0F6E56}
 .add-btn{font-size:11px;padding:4px 10px;border:1px solid #5DCAA5;border-radius:12px;background:#E1F5EE;color:#085041;cursor:pointer;font-family:inherit}
 .section-title{font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#888;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid #f0f0f0;margin-top:1.25rem}
 .alumna-grid{display:flex;flex-direction:column;gap:6px}
 .alumna-row{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:10px}
-.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
-.av-t{background:#E1F5EE;color:#0F6E56}.av-p{background:#EEEDFE;color:#534AB7}.av-a{background:#FAEEDA;color:#854F0B}.av-c{background:#FBEAF0;color:#993556}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:#E1F5EE;color:#0F6E56}
 .alumna-info{flex:1;min-width:0}.alumna-name{font-size:13px;font-weight:500}.alumna-sub{font-size:11px;color:#888;margin-top:1px}
 .status-badge{font-size:11px;padding:3px 8px;border-radius:12px;font-weight:500;flex-shrink:0;cursor:pointer}
 .sb-al-dia{background:#E1F5EE;color:#085041}.sb-pendiente{background:#FAEEDA;color:#633806}.sb-vencido{background:#FCEBEB;color:#791F1F}
-.pago-col{font-size:12px;color:#888;text-align:right;min-width:70px}.asist-col{font-size:12px;color:#888;text-align:center;min-width:50px}
-.filter-row{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.pago-col{font-size:12px;color:#888;text-align:right;min-width:70px}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap}
 .filter-btn{font-size:11px;padding:4px 10px;border:1px solid #e5e5e0;border-radius:12px;background:#fff;color:#666;cursor:pointer;font-family:inherit}
 .filter-btn.active{background:#E1F5EE;color:#085041;border-color:#5DCAA5;font-weight:500}
 .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.icon-btn{background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:4px;border-radius:6px}
+.icon-btn:hover{background:#F5F5F0;color:#1a1a1a}
+.icon-btn.danger:hover{color:#A32D2D}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
 .modal-overlay.open{display:flex}
-.modal{background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:400px;margin:1rem}
+.modal{background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:420px;margin:1rem;max-height:90vh;overflow-y:auto}
 .modal-title{font-size:15px;font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
-.form-group{margin-bottom:0.875rem}
-.form-label{font-size:12px;color:#666;margin-bottom:4px;display:block}
-.form-group input,.form-group select{width:100%;font-size:13px;padding:8px 10px;border:1px solid #e0e0e0;border-radius:8px;font-family:inherit;background:#fff;color:#1a1a1a}
+.form-group select{width:100%;font-size:13px;padding:9px 11px;border:1px solid #e0e0e0;border-radius:8px;font-family:inherit;background:#fff;color:#1a1a1a}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.btn-primary{background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;width:100%;margin-top:0.5rem}
 .btn-secondary{background:#F5F5F0;color:#666;border:1px solid #e5e5e0;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;margin-top:6px}
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.btn-danger{background:#FCEBEB;color:#791F1F;border:1px solid #F09595;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;margin-top:6px}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat-card{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:1rem}
 .stat-title{font-size:11px;color:#888;margin-bottom:0.75rem;font-weight:500;text-transform:uppercase;letter-spacing:0.07em}
 .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.bar-label{font-size:11px;color:#888;width:60px;flex-shrink:0}
+.bar-label{font-size:11px;color:#888;width:70px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar-track{flex:1;height:6px;background:#F5F5F0;border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;background:#1D9E75}
 .bar-val{font-size:11px;font-weight:500;color:#0F6E56;width:30px;text-align:right}
@@ -77,386 +96,671 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .fin-row:last-child{border-bottom:none}
 .fin-label{color:#666}.fin-val{font-weight:500}
 .fin-val.ing{color:#0F6E56}.fin-val.gasto{color:#A32D2D}.fin-val.neto{color:#185FA5}
+.empty-state{text-align:center;padding:3rem 1rem;color:#888}
+.empty-state i{font-size:32px;display:block;margin-bottom:0.75rem;color:#ccc}
+.empty-state p{font-size:13px;margin-bottom:1rem}
+.disc-grid{display:flex;flex-direction:column;gap:8px}
+.disc-row{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:0.875rem 1rem;display:flex;align-items:center;gap:10px}
+.disc-color{width:14px;height:14px;border-radius:50%;flex-shrink:0}
+.disc-info{flex:1}.disc-name{font-size:13px;font-weight:500}.disc-sub{font-size:11px;color:#888;margin-top:2px}
+.loading{text-align:center;padding:3rem;color:#888;font-size:13px}
 .week-nav{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
 .week-label{font-size:13px;font-weight:500;flex:1;text-align:center}
 .week-btn{background:#fff;border:1px solid #e5e5e0;border-radius:8px;padding:4px 12px;cursor:pointer;font-family:inherit;font-size:12px;color:#666}
-@media(max-width:600px){.metrics{grid-template-columns:repeat(2,1fr)}.nav-btn span{display:none}.stats-grid{grid-template-columns:1fr}}
+.asist-chip{font-size:11px;padding:4px 10px;border-radius:12px;background:#F5F5F0;color:#555;border:1px solid #e5e5e0;cursor:pointer;transition:all 0.15s}
+.asist-chip.asistio{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
+.asist-chip.ausente{background:#FCEBEB;color:#791F1F;border-color:#F09595}
+.fin-item{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.fin-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.fin-icon.ing{background:#E1F5EE;color:#0F6E56}.fin-icon.gasto{background:#FCEBEB;color:#A32D2D}
+.fin-info{flex:1}.fin-desc{font-size:13px;font-weight:500}.fin-fecha{font-size:11px;color:#888}
+@media(max-width:600px){.metrics{grid-template-columns:repeat(2,1fr)}.nav-btn span{display:none}.stats-grid{grid-template-columns:1fr}.topbar{padding:0 1rem}.centro-name{display:none}}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="logo">Pilates<span>Hub</span></div>
-  <div class="nav">
-    <button class="nav-btn active" onclick="showScreen('agenda')"><i class="ti ti-calendar"></i> <span>Agenda</span></button>
-    <button class="nav-btn" onclick="showScreen('alumnas')"><i class="ti ti-users"></i> <span>Alumnas</span></button>
-    <button class="nav-btn" onclick="showScreen('asistencias')"><i class="ti ti-clipboard-check"></i> <span>Asistencias</span></button>
-    <button class="nav-btn" onclick="showScreen('finanzas')"><i class="ti ti-chart-bar"></i> <span>Finanzas</span></button>
+<!-- AUTH -->
+<div id="auth-wrap" class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">Pilates<span>Hub</span></div>
+    <div class="auth-sub">Gestión inteligente para tu estudio</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Crear cuenta</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <div id="auth-success" class="auth-success"></div>
+
+    <div id="tab-login">
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" placeholder="tu@email.com"></div>
+      <div class="form-group"><label class="form-label">Contraseña</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn-primary" onclick="doLogin()"><i class="ti ti-login"></i> Entrar</button>
+      <button class="btn-link" onclick="switchAuthTab('recover')">Olvidé mi contraseña</button>
+    </div>
+
+    <div id="tab-register" class="hidden">
+      <div class="form-group"><label class="form-label">Nombre de tu estudio</label><input type="text" id="reg-nombre" placeholder="Ej: Pilates Studio Córdoba"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" id="reg-email" placeholder="tu@email.com"></div>
+      <div class="form-group"><label class="form-label">Contraseña</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"></div>
+      <button class="btn-primary" onclick="doRegister()"><i class="ti ti-user-plus"></i> Crear cuenta</button>
+    </div>
+
+    <div id="tab-recover" class="hidden">
+      <div class="form-group"><label class="form-label">Email de tu cuenta</label><input type="email" id="rec-email" placeholder="tu@email.com"></div>
+      <button class="btn-primary" onclick="doRecover()"><i class="ti ti-mail"></i> Enviar link de recuperación</button>
+      <button class="btn-link" onclick="switchAuthTab('login')">Volver al inicio de sesión</button>
+    </div>
   </div>
 </div>
 
-<div class="main">
-  <div class="metrics">
-    <div class="met"><div class="met-n teal" id="m-total">45</div><div class="met-l">Alumnas activas</div></div>
-    <div class="met"><div class="met-n amber" id="m-pendientes">4</div><div class="met-l">Cuotas pendientes</div></div>
-    <div class="met"><div class="met-n coral" id="m-libres">8</div><div class="met-l">Lugares libres hoy</div></div>
-    <div class="met"><div class="met-n purple">16</div><div class="met-l">Clases esta semana</div></div>
-  </div>
-
-  <div id="screen-agenda" class="screen active">
-    <div class="week-nav">
-      <button class="week-btn"><i class="ti ti-chevron-left"></i></button>
-      <div class="week-label">Semana del 9 al 13 de junio · 2026</div>
-      <button class="week-btn"><i class="ti ti-chevron-right"></i></button>
+<!-- APP -->
+<div id="app-wrap" class="hidden">
+  <div class="topbar">
+    <div class="logo">Pilates<span>Hub</span></div>
+    <div class="nav">
+      <button class="nav-btn active" onclick="showScreen('agenda')"><i class="ti ti-calendar"></i> <span>Agenda</span></button>
+      <button class="nav-btn" onclick="showScreen('alumnas')"><i class="ti ti-users"></i> <span>Alumnas</span></button>
+      <button class="nav-btn" onclick="showScreen('asistencias')"><i class="ti ti-clipboard-check"></i> <span>Asistencias</span></button>
+      <button class="nav-btn" onclick="showScreen('finanzas')"><i class="ti ti-chart-bar"></i> <span>Finanzas</span></button>
+      <button class="nav-btn" onclick="showScreen('disciplinas')"><i class="ti ti-yoga"></i> <span>Disciplinas</span></button>
     </div>
-    <div class="day-tabs">
-      <button class="day-tab active" onclick="showDay('lun',this)">Lunes</button>
-      <button class="day-tab" onclick="showDay('mar',this)">Martes</button>
-      <button class="day-tab" onclick="showDay('mie',this)">Miércoles</button>
-      <button class="day-tab" onclick="showDay('jue',this)">Jueves</button>
-      <button class="day-tab friday" onclick="showDay('vie',this)">Viernes · Reset</button>
-    </div>
-    <div id="slots-container" class="slots"></div>
-  </div>
-
-  <div id="screen-alumnas" class="screen">
-    <div class="top-row">
-      <div class="filter-row" style="margin-bottom:0">
-        <button class="filter-btn active" onclick="filterAlumnas('todas',this)">Todas</button>
-        <button class="filter-btn" onclick="filterAlumnas('reformer',this)">Reformer</button>
-        <button class="filter-btn" onclick="filterAlumnas('reset',this)">Viernes Reset</button>
-        <button class="filter-btn" onclick="filterAlumnas('yoga',this)">Yoga</button>
-        <button class="filter-btn" onclick="filterAlumnas('pendiente',this)">Cuota pendiente</button>
-      </div>
-      <button class="add-btn" onclick="openModal()" style="padding:6px 14px;font-size:12px"><i class="ti ti-plus"></i> Nueva alumna</button>
-    </div>
-    <div id="alumna-grid" class="alumna-grid"></div>
-  </div>
-
-  <div id="screen-asistencias" class="screen">
-    <div class="day-tabs">
-      <button class="day-tab active" onclick="showAsistDay('lun',this)">Lunes</button>
-      <button class="day-tab" onclick="showAsistDay('mar',this)">Martes</button>
-      <button class="day-tab" onclick="showAsistDay('mie',this)">Miércoles</button>
-      <button class="day-tab" onclick="showAsistDay('jue',this)">Jueves</button>
-      <button class="day-tab friday" onclick="showAsistDay('vie',this)">Viernes</button>
-    </div>
-    <div id="asist-container" class="slots"></div>
-    <div class="section-title" style="margin-top:1.5rem">Estadísticas del mes</div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-title">Asistencia por turno</div>
-        <div class="bar-row"><div class="bar-label">08:00 hs</div><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div><div class="bar-val">90%</div></div>
-        <div class="bar-row"><div class="bar-label">13:15 hs</div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><div class="bar-val">75%</div></div>
-        <div class="bar-row"><div class="bar-label">14:10 hs</div><div class="bar-track"><div class="bar-fill" style="width:83%"></div></div><div class="bar-val">83%</div></div>
-        <div class="bar-row"><div class="bar-label">15:00 hs</div><div class="bar-track"><div class="bar-fill" style="width:67%"></div></div><div class="bar-val">67%</div></div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">Por modalidad</div>
-        <div class="bar-row"><div class="bar-label">Reformer</div><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><div class="bar-val">82%</div></div>
-        <div class="bar-row"><div class="bar-label">Reset</div><div class="bar-track"><div class="bar-fill" style="width:78%;background:#7F77DD"></div></div><div class="bar-val">78%</div></div>
-        <div class="bar-row"><div class="bar-label">Yoga</div><div class="bar-track"><div class="bar-fill" style="width:95%;background:#BA7517"></div></div><div class="bar-val">95%</div></div>
-      </div>
+    <div class="topbar-right">
+      <span class="centro-name" id="centro-name"></span>
+      <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> Salir</button>
     </div>
   </div>
 
-  <div id="screen-finanzas" class="screen">
-    <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
-      <div class="met"><div class="met-n teal">$187.500</div><div class="met-l">Ingresos junio</div></div>
-      <div class="met"><div class="met-n coral">$32.000</div><div class="met-l">Gastos junio</div></div>
-      <div class="met"><div class="met-n purple">$155.500</div><div class="met-l">Resultado neto</div></div>
+  <div class="main">
+    <div class="metrics">
+      <div class="met"><div class="met-n teal" id="m-total">0</div><div class="met-l">Alumnas activas</div></div>
+      <div class="met"><div class="met-n amber" id="m-pendientes">0</div><div class="met-l">Cuotas pendientes</div></div>
+      <div class="met"><div class="met-n coral" id="m-disciplinas">0</div><div class="met-l">Disciplinas</div></div>
+      <div class="met"><div class="met-n purple" id="m-ingresos">$0</div><div class="met-l">Ingresos del mes</div></div>
     </div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-title">Ingresos por modalidad</div>
-        <div class="bar-row"><div class="bar-label">Reformer</div><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><div class="bar-val">78%</div></div>
-        <div class="bar-row"><div class="bar-label">Reset</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:#7F77DD"></div></div><div class="bar-val">18%</div></div>
-        <div class="bar-row"><div class="bar-label">Yoga</div><div class="bar-track"><div class="bar-fill" style="width:4%;background:#BA7517"></div></div><div class="bar-val">4%</div></div>
+
+    <!-- AGENDA -->
+    <div id="screen-agenda" class="screen active">
+      <div class="week-nav">
+        <button class="week-btn"><i class="ti ti-chevron-left"></i></button>
+        <div class="week-label" id="week-label">Semana actual</div>
+        <button class="week-btn"><i class="ti ti-chevron-right"></i></button>
       </div>
-      <div class="stat-card">
-        <div class="stat-title">Resumen del mes</div>
-        <div class="fin-row"><div class="fin-label">Cuotas cobradas</div><div class="fin-val ing">$187.500</div></div>
-        <div class="fin-row"><div class="fin-label">Alquiler</div><div class="fin-val gasto">-$18.000</div></div>
-        <div class="fin-row"><div class="fin-label">Servicios</div><div class="fin-val gasto">-$8.000</div></div>
-        <div class="fin-row"><div class="fin-label">Insumos</div><div class="fin-val gasto">-$6.000</div></div>
-        <div class="fin-row" style="border-top:2px solid #e5e5e0;margin-top:4px;padding-top:8px"><div class="fin-label" style="font-weight:500">Resultado</div><div class="fin-val neto">$155.500</div></div>
-      </div>
+      <div class="day-tabs" id="day-tabs-agenda"></div>
+      <div id="slots-container" class="slots"></div>
     </div>
-    <div class="section-title">Estado de cuotas · Junio 2026</div>
-    <div id="cuotas-list" class="alumna-grid"></div>
+
+    <!-- ALUMNAS -->
+    <div id="screen-alumnas" class="screen">
+      <div class="top-row">
+        <div class="filter-row" id="filter-row"></div>
+        <button class="add-btn" onclick="openModal('alumna')" style="padding:6px 14px;font-size:12px"><i class="ti ti-plus"></i> Nueva alumna</button>
+      </div>
+      <div id="alumna-grid" class="alumna-grid"></div>
+    </div>
+
+    <!-- ASISTENCIAS -->
+    <div id="screen-asistencias" class="screen">
+      <div class="day-tabs" id="day-tabs-asist"></div>
+      <div id="asist-container" class="slots"></div>
+      <div class="section-title">Estadísticas del mes</div>
+      <div class="stats-grid" id="stats-asist"></div>
+    </div>
+
+    <!-- FINANZAS -->
+    <div id="screen-finanzas" class="screen">
+      <div class="metrics" style="grid-template-columns:repeat(3,1fr)" id="fin-metrics"></div>
+      <div class="top-row" style="margin-top:1rem">
+        <div class="section-title" style="margin:0">Movimientos</div>
+        <button class="add-btn" onclick="openModal('finanza')" style="padding:6px 14px;font-size:12px"><i class="ti ti-plus"></i> Agregar movimiento</button>
+      </div>
+      <div id="fin-list"></div>
+      <div class="section-title">Estado de cuotas</div>
+      <div id="cuotas-list" class="alumna-grid"></div>
+    </div>
+
+    <!-- DISCIPLINAS -->
+    <div id="screen-disciplinas" class="screen">
+      <div class="top-row">
+        <div style="font-size:13px;color:#888">Configurá las disciplinas de tu estudio</div>
+        <button class="add-btn" onclick="openModal('disciplina')" style="padding:6px 14px;font-size:12px"><i class="ti ti-plus"></i> Nueva disciplina</button>
+      </div>
+      <div id="disc-grid" class="disc-grid"></div>
+    </div>
   </div>
 </div>
 
+<!-- MODALES -->
 <div class="modal-overlay" id="modal-overlay">
-  <div class="modal">
-    <div class="modal-title"><i class="ti ti-user-plus"></i> Nueva alumna</div>
-    <div class="form-group">
-      <label class="form-label">Nombre completo</label>
-      <input type="text" id="new-nombre" placeholder="Ej: María González">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Modalidad</label>
-        <select id="new-modal">
-          <option value="reformer">Pilates Reformer</option>
-          <option value="reset">Viernes Reset</option>
-          <option value="yoga">Yoga</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Turno</label>
-        <select id="new-turno">
-          <option>08:00</option>
-          <option>13:15</option>
-          <option>14:10</option>
-          <option>15:00</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Teléfono WhatsApp</label>
-      <input type="text" id="new-tel" placeholder="Ej: 351 123-4567">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Cuota mensual ($)</label>
-        <input type="number" id="new-cuota" placeholder="Ej: 8500">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Estado de pago</label>
-        <select id="new-pago">
-          <option value="al-dia">Al día</option>
-          <option value="pendiente">Pendiente</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn-primary" onclick="agregarAlumna()"><i class="ti ti-check"></i> Guardar alumna</button>
-    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-  </div>
+  <div class="modal" id="modal-content"></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const TURNOS=['08:00','13:15','14:10','15:00'];
-const CAPS={reformer:3,reset:7,yoga:2};
-const COLORS=['av-t','av-p','av-a','av-c'];
+const SUPABASE_URL='https://arsryamzkhwnnwtsaqgx.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyc3J5YW16a2h3bm53dHNhcWd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NDg0MjAsImV4cCI6MjA5NzAyNDQyMH0.8zSsqMOKJI_elEwWUKCznSuEuqymWEh2M2e6VD_b988';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let currentUser=null;
+let centroData=null;
+let alumnas=[];
+let disciplinas=[];
+let finanzas=[];
+let asistencias=[];
 let currentDay='lun';
 let currentAsistDay='lun';
 let currentFilter='todas';
-let asistencias={};
+let editingId=null;
 
-let alumnas=[
-  {id:1,nombre:'Sofía Martínez',modal:'reformer',turno:'08:00',tel:'351 111-0001',cuota:8500,pago:'al-dia',asist:18},
-  {id:2,nombre:'Valentina López',modal:'reformer',turno:'08:00',tel:'351 111-0002',cuota:8500,pago:'al-dia',asist:20},
-  {id:3,nombre:'Camila Torres',modal:'reformer',turno:'08:00',tel:'351 111-0003',cuota:8500,pago:'pendiente',asist:14},
-  {id:4,nombre:'Lucía Fernández',modal:'reformer',turno:'13:15',tel:'351 111-0004',cuota:8500,pago:'al-dia',asist:22},
-  {id:5,nombre:'Martina García',modal:'reformer',turno:'13:15',tel:'351 111-0005',cuota:8500,pago:'al-dia',asist:19},
-  {id:6,nombre:'Julieta Rodríguez',modal:'reformer',turno:'13:15',tel:'351 111-0006',cuota:8500,pago:'vencido',asist:8},
-  {id:7,nombre:'Ana Gómez',modal:'reformer',turno:'14:10',tel:'351 111-0007',cuota:8500,pago:'al-dia',asist:21},
-  {id:8,nombre:'Paula Herrera',modal:'reformer',turno:'14:10',tel:'351 111-0008',cuota:8500,pago:'al-dia',asist:23},
-  {id:9,nombre:'Florencia Díaz',modal:'reformer',turno:'14:10',tel:'351 111-0009',cuota:8500,pago:'pendiente',asist:16},
-  {id:10,nombre:'Romina Pérez',modal:'reformer',turno:'15:00',tel:'351 111-0010',cuota:8500,pago:'al-dia',asist:20},
-  {id:11,nombre:'Natalia Sosa',modal:'reformer',turno:'15:00',tel:'351 111-0011',cuota:8500,pago:'al-dia',asist:18},
-  {id:12,nombre:'Carolina Ruiz',modal:'reformer',turno:'15:00',tel:'351 111-0012',cuota:8500,pago:'al-dia',asist:22},
-  {id:13,nombre:'Agustina Vega',modal:'reset',turno:'08:00',tel:'351 111-0013',cuota:5500,pago:'al-dia',asist:17},
-  {id:14,nombre:'Daniela Moreno',modal:'reset',turno:'08:00',tel:'351 111-0014',cuota:5500,pago:'al-dia',asist:19},
-  {id:15,nombre:'Micaela Castro',modal:'reset',turno:'08:00',tel:'351 111-0015',cuota:5500,pago:'al-dia',asist:20},
-  {id:16,nombre:'Verónica Ríos',modal:'reset',turno:'08:00',tel:'351 111-0016',cuota:5500,pago:'pendiente',asist:12},
-  {id:17,nombre:'Laura Mendoza',modal:'reset',turno:'08:00',tel:'351 111-0017',cuota:5500,pago:'al-dia',asist:18},
-  {id:18,nombre:'Cecilia Vargas',modal:'reset',turno:'13:15',tel:'351 111-0018',cuota:5500,pago:'al-dia',asist:21},
-  {id:19,nombre:'Mariana Silva',modal:'reset',turno:'13:15',tel:'351 111-0019',cuota:5500,pago:'al-dia',asist:16},
-  {id:20,nombre:'Patricia Aguirre',modal:'reset',turno:'13:15',tel:'351 111-0020',cuota:5500,pago:'vencido',asist:5},
-  {id:21,nombre:'Graciela Ibáñez',modal:'reset',turno:'14:10',tel:'351 111-0021',cuota:5500,pago:'al-dia',asist:19},
-  {id:22,nombre:'Mónica Suárez',modal:'reset',turno:'15:00',tel:'351 111-0022',cuota:5500,pago:'al-dia',asist:17},
-  {id:23,nombre:'Adriana Flores',modal:'yoga',turno:'08:00',tel:'351 111-0023',cuota:4000,pago:'al-dia',asist:22},
-  {id:24,nombre:'Beatriz Romero',modal:'yoga',turno:'08:00',tel:'351 111-0024',cuota:4000,pago:'al-dia',asist:20},
-];
+const DAYS=[{k:'lun',l:'Lunes'},{k:'mar',l:'Martes'},{k:'mie',l:'Miércoles'},{k:'jue',l:'Jueves'},{k:'vie',l:'Viernes'},{k:'sab',l:'Sábado'}];
+
+function toast(msg,type='dark'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=type==='ok'?'#0F6E56':type==='err'?'#A32D2D':'#1a1a1a';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
 
 function initials(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
-function avatarColor(id){return COLORS[id%4]}
 
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2500);
+function showAuthError(msg){
+  const el=document.getElementById('auth-error');
+  el.textContent=msg;el.style.display='block';
+  document.getElementById('auth-success').style.display='none';
+}
+function showAuthSuccess(msg){
+  const el=document.getElementById('auth-success');
+  el.textContent=msg;el.style.display='block';
+  document.getElementById('auth-error').style.display='none';
+}
+function clearAuthMsg(){
+  document.getElementById('auth-error').style.display='none';
+  document.getElementById('auth-success').style.display='none';
 }
 
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('screen-'+id).classList.add('active');
-  const map={agenda:0,alumnas:1,asistencias:2,finanzas:3};
-  if(map[id]!==undefined) document.querySelectorAll('.nav-btn')[map[id]].classList.add('active');
-  if(id==='alumnas') renderAlumnas();
-  if(id==='finanzas') renderCuotas();
-  if(id==='asistencias') renderAsistencias(currentAsistDay);
+function switchAuthTab(tab){
+  ['login','register','recover'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('hidden',t!==tab);
+  });
+  document.querySelectorAll('.auth-tab').forEach((b,i)=>{
+    b.classList.toggle('active',['login','register'].indexOf(tab)===i);
+  });
+  clearAuthMsg();
 }
 
-function getBySlot(modal,turno){return alumnas.filter(a=>a.modal===modal&&a.turno===turno)}
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){showAuthError('Completá todos los campos');return;}
+  const{error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){showAuthError('Email o contraseña incorrectos');return;}
+}
+
+async function doRegister(){
+  const nombre=document.getElementById('reg-nombre').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  if(!nombre||!email||!pass){showAuthError('Completá todos los campos');return;}
+  if(pass.length<6){showAuthError('La contraseña debe tener al menos 6 caracteres');return;}
+  const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{nombre_centro:nombre}}});
+  if(error){showAuthError('Error al crear la cuenta: '+error.message);return;}
+  if(data.user){
+    await sb.from('centros').insert({id:data.user.id,nombre,email});
+  }
+  showAuthSuccess('Cuenta creada. Revisá tu email para confirmar.');
+}
+
+async function doRecover(){
+  const email=document.getElementById('rec-email').value.trim();
+  if(!email){showAuthError('Ingresá tu email');return;}
+  const{error}=await sb.auth.resetPasswordForEmail(email);
+  if(error){showAuthError('Error: '+error.message);return;}
+  showAuthSuccess('Te enviamos un link para restablecer tu contraseña.');
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  document.getElementById('app-wrap').classList.add('hidden');
+  document.getElementById('auth-wrap').classList.remove('hidden');
+  alumnas=[];disciplinas=[];finanzas=[];asistencias=[];
+  currentUser=null;centroData=null;
+}
+
+async function loadAppData(){
+  const[{data:c},{data:a},{data:d},{data:f},{data:as}]=await Promise.all([
+    sb.from('centros').select('*').eq('id',currentUser.id).single(),
+    sb.from('alumnas').select('*').eq('centro_id',currentUser.id).order('nombre'),
+    sb.from('disciplinas').select('*').eq('centro_id',currentUser.id).order('nombre'),
+    sb.from('finanzas').select('*').eq('centro_id',currentUser.id).order('fecha',{ascending:false}),
+    sb.from('asistencias').select('*').eq('centro_id',currentUser.id)
+  ]);
+  centroData=c;
+  alumnas=a||[];
+  disciplinas=d||[];
+  finanzas=f||[];
+  asistencias=as||[];
+  document.getElementById('centro-name').textContent=centroData?.nombre||'';
+  updateMetrics();
+  buildDayTabs();
+  renderAgenda(currentDay);
+  renderAlumnas();
+  renderDisciplinas();
+  renderFinanzas();
+  renderCuotas();
+  buildStats();
+}
+
+function updateMetrics(){
+  document.getElementById('m-total').textContent=alumnas.length;
+  document.getElementById('m-pendientes').textContent=alumnas.filter(a=>a.pago!=='al-dia').length;
+  document.getElementById('m-disciplinas').textContent=disciplinas.length;
+  const mes=new Date().getMonth()+1;
+  const año=new Date().getFullYear();
+  const ing=finanzas.filter(f=>f.tipo==='ingreso'&&new Date(f.fecha).getMonth()+1===mes&&new Date(f.fecha).getFullYear()===año).reduce((s,f)=>s+Number(f.monto),0);
+  document.getElementById('m-ingresos').textContent='$'+ing.toLocaleString();
+}
+
+function buildDayTabs(){
+  const usedDays=new Set();
+  disciplinas.forEach(d=>(d.dias||[]).forEach(day=>usedDays.add(day)));
+  if(!usedDays.size) DAYS.slice(0,5).forEach(d=>usedDays.add(d.k));
+  const days=DAYS.filter(d=>usedDays.has(d.k));
+
+  ['agenda','asist'].forEach(type=>{
+    const el=document.getElementById('day-tabs-'+type);
+    el.innerHTML=days.map((d,i)=>`<button class="day-tab${i===0?' active':''}" onclick="show${type==='agenda'?'Day':'AsistDay'}('${d.k}',this)">${d.l}</button>`).join('');
+  });
+  if(days.length) currentDay=days[0].k;
+}
 
 function renderAgenda(day){
-  const isVie=day==='vie';
-  const modal=isVie?'reset':'reformer';
-  const cap=CAPS[modal];
-  const typeLabel=isVie?'Viernes Reset':'Pilates Reformer';
-  const typeClass=isVie?'st-reset':'st-reformer';
-  const ocupClass=isVie?'ocupado-v':'ocupado';
+  currentDay=day;
   const c=document.getElementById('slots-container');
+  const dayDiscs=disciplinas.filter(d=>(d.dias||[]).includes(day));
+  if(!dayDiscs.length){c.innerHTML='<div class="empty-state"><i class="ti ti-calendar-off"></i><p>No hay disciplinas para este día.<br>Creá una en la sección Disciplinas.</p></div>';return;}
   c.innerHTML='';
-  TURNOS.forEach(t=>{
-    const ins=getBySlot(modal,t);
-    const libre=cap-ins.length;
-    let cuposHTML='';
-    for(let i=0;i<cap;i++){
-      const a=ins[i];
-      cuposHTML+=`<div class="cupo ${a?ocupClass:'libre'}" title="${a?a.nombre:'Libre'}">${a?initials(a.nombre):'+'}</div>`;
-    }
-    const alHTML=ins.map(a=>`<span class="alumna-chip">${a.nombre.split(' ')[0]}</span>`).join('');
-    const div=document.createElement('div');
-    div.className='slot';
-    div.innerHTML=`
-      <div class="slot-header">
-        <div class="slot-time"><i class="ti ti-clock"></i> ${t} hs</div>
-        <span class="slot-type ${typeClass}">${typeLabel}</span>
-      </div>
-      <div class="cupos-bar">${cuposHTML}<span class="cupo-label">${libre} lugar${libre!==1?'es':''} libre${libre!==1?'s':''}</span></div>
-      <div class="alumnas-list">${alHTML||'<span style="font-size:12px;color:#aaa">Sin alumnas asignadas</span>'}</div>
-      <div class="slot-footer">
-        <span class="libre-count"><span>${ins.length}</span>/${cap} ocupados</span>
-        ${libre>0?`<button class="add-btn" onclick="openModal()"><i class="ti ti-plus"></i> Agregar alumna</button>`:'<span style="font-size:11px;color:#993C1D;font-weight:500">Turno completo</span>'}
-      </div>`;
-    c.appendChild(div);
+  dayDiscs.forEach(disc=>{
+    const turnos=disc.turnos||[];
+    turnos.forEach(turno=>{
+      const ins=alumnas.filter(a=>a.disciplina_id===disc.id&&a.turno===turno);
+      const cap=disc.capacidad||3;
+      const libre=cap-ins.length;
+      let cuposHTML='';
+      for(let i=0;i<cap;i++){
+        const a=ins[i];
+        cuposHTML+=`<div class="cupo ${a?'ocupado':'libre'}" title="${a?a.nombre:'Libre'}">${a?initials(a.nombre):'+'}</div>`;
+      }
+      const alHTML=ins.map(a=>`<span class="alumna-chip">${a.nombre.split(' ')[0]}</span>`).join('');
+      const div=document.createElement('div');
+      div.className='slot';
+      div.innerHTML=`
+        <div class="slot-header">
+          <div class="slot-time"><i class="ti ti-clock"></i> ${turno} hs</div>
+          <span class="slot-type" style="background:${disc.color||'#0F6E56'}">${disc.nombre}</span>
+        </div>
+        <div class="cupos-bar">${cuposHTML}<span class="cupo-label">${libre} lugar${libre!==1?'es':''} libre${libre!==1?'s':''}</span></div>
+        <div class="alumnas-list">${alHTML||'<span style="font-size:12px;color:#aaa">Sin alumnas asignadas</span>'}</div>
+        <div class="slot-footer">
+          <span class="libre-count"><span>${ins.length}</span>/${cap} ocupados</span>
+          ${libre>0?`<button class="add-btn" onclick="openModal('alumna')"><i class="ti ti-plus"></i> Agregar alumna</button>`:'<span style="font-size:11px;color:#993C1D;font-weight:500">Turno completo</span>'}
+        </div>`;
+      c.appendChild(div);
+    });
   });
 }
 
 function showDay(day,btn){
-  currentDay=day;
-  document.querySelectorAll('#screen-agenda .day-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#day-tabs-agenda .day-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderAgenda(day);
 }
 
 function renderAlumnas(){
-  let list=alumnas;
-  if(currentFilter==='reformer') list=alumnas.filter(a=>a.modal==='reformer');
-  else if(currentFilter==='reset') list=alumnas.filter(a=>a.modal==='reset');
-  else if(currentFilter==='yoga') list=alumnas.filter(a=>a.modal==='yoga');
-  else if(currentFilter==='pendiente') list=alumnas.filter(a=>a.pago!=='al-dia');
-  const labels={reformer:'Pilates Reformer',reset:'Viernes Reset',yoga:'Yoga'};
   const pLabel={'al-dia':'Al día',pendiente:'Pendiente',vencido:'Vencido'};
   const pClass={'al-dia':'sb-al-dia',pendiente:'sb-pendiente',vencido:'sb-vencido'};
-  document.getElementById('alumna-grid').innerHTML=list.map(a=>`
+  let list=alumnas;
+  if(currentFilter==='pendiente') list=alumnas.filter(a=>a.pago!=='al-dia');
+  else if(currentFilter!=='todas'){
+    const disc=disciplinas.find(d=>d.id===currentFilter);
+    if(disc) list=alumnas.filter(a=>a.disciplina_id===disc.id);
+  }
+
+  const filterRow=document.getElementById('filter-row');
+  filterRow.innerHTML=`<button class="filter-btn${currentFilter==='todas'?' active':''}" onclick="setFilter('todas',this)">Todas</button>`+
+    disciplinas.map(d=>`<button class="filter-btn${currentFilter===d.id?' active':''}" onclick="setFilter('${d.id}',this)">${d.nombre}</button>`).join('')+
+    `<button class="filter-btn${currentFilter==='pendiente'?' active':''}" onclick="setFilter('pendiente',this)">Cuota pendiente</button>`;
+
+  const grid=document.getElementById('alumna-grid');
+  if(!list.length){
+    grid.innerHTML='<div class="empty-state"><i class="ti ti-users"></i><p>No hay alumnas todavía.<br>Agregá tu primera alumna.</p></div>';return;
+  }
+  const discMap={};disciplinas.forEach(d=>discMap[d.id]=d);
+  grid.innerHTML=list.map(a=>`
     <div class="alumna-row">
-      <div class="av ${avatarColor(a.id)}">${initials(a.nombre)}</div>
+      <div class="av">${initials(a.nombre)}</div>
       <div class="alumna-info">
         <div class="alumna-name">${a.nombre}</div>
-        <div class="alumna-sub">${labels[a.modal]} · ${a.turno} hs · ${a.tel}</div>
+        <div class="alumna-sub">${discMap[a.disciplina_id]?.nombre||'Sin disciplina'} · ${a.turno||'-'} hs${a.telefono?' · '+a.telefono:''}</div>
       </div>
-      <div class="asist-col"><i class="ti ti-clipboard-check"></i> ${a.asist}</div>
-      <div class="pago-col">$${a.cuota.toLocaleString()}</div>
-      <span class="status-badge ${pClass[a.pago]}" onclick="togglePagoAlumna(${a.id})">${pLabel[a.pago]}</span>
+      <div class="pago-col">$${Number(a.cuota).toLocaleString()}</div>
+      <span class="status-badge ${pClass[a.pago]||'sb-pendiente'}" onclick="togglePago('${a.id}')">${pLabel[a.pago]||'Pendiente'}</span>
+      <button class="icon-btn" onclick="openModal('alumna','${a.id}')" title="Editar"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn danger" onclick="deleteAlumna('${a.id}')" title="Eliminar"><i class="ti ti-trash"></i></button>
     </div>`).join('');
 }
 
-function filterAlumnas(f,btn){
+function setFilter(f,btn){
   currentFilter=f;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderAlumnas();
 }
 
-function renderAsistencias(day){
-  const isVie=day==='vie';
-  const modal=isVie?'reset':'reformer';
-  const c=document.getElementById('asist-container');
-  c.innerHTML='';
-  TURNOS.forEach(t=>{
-    const ins=getBySlot(modal,t);
-    if(!ins.length) return;
-    const div=document.createElement('div');
-    div.className='slot';
-    const chips=ins.map(a=>{
-      const key=`${day}-${t}-${a.id}`;
-      const st=asistencias[key]||'sin';
-      const cls=st==='asistio'?'alumna-chip asistio':st==='ausente'?'alumna-chip ausente':'alumna-chip';
-      return `<span class="${cls}" onclick="toggleAsist('${key}','${a.nombre}')">${a.nombre.split(' ')[0]}</span>`;
-    }).join('');
-    div.innerHTML=`
-      <div class="slot-header">
-        <div class="slot-time"><i class="ti ti-clock"></i> ${t} hs</div>
-        <span class="slot-type ${isVie?'st-reset':'st-reformer'}">${ins.length} alumnas</span>
+async function togglePago(id){
+  const a=alumnas.find(x=>x.id===id);if(!a)return;
+  const cycle={'al-dia':'pendiente',pendiente:'vencido',vencido:'al-dia'};
+  a.pago=cycle[a.pago];
+  await sb.from('alumnas').update({pago:a.pago}).eq('id',id);
+  toast(`${a.nombre.split(' ')[0]} — ${a.pago==='al-dia'?'al día':a.pago}`,'ok');
+  renderAlumnas();renderCuotas();updateMetrics();
+}
+
+async function deleteAlumna(id){
+  if(!confirm('¿Eliminar esta alumna?'))return;
+  await sb.from('alumnas').delete().eq('id',id);
+  alumnas=alumnas.filter(a=>a.id!==id);
+  toast('Alumna eliminada');renderAlumnas();updateMetrics();renderAgenda(currentDay);
+}
+
+function renderDisciplinas(){
+  const grid=document.getElementById('disc-grid');
+  if(!disciplinas.length){
+    grid.innerHTML='<div class="empty-state"><i class="ti ti-yoga"></i><p>No hay disciplinas creadas todavía.<br>Creá tu primera disciplina.</p></div>';return;
+  }
+  const dayMap={lun:'Lun',mar:'Mar',mie:'Mié',jue:'Jue',vie:'Vie',sab:'Sáb',dom:'Dom'};
+  grid.innerHTML=disciplinas.map(d=>`
+    <div class="disc-row">
+      <div class="disc-color" style="background:${d.color||'#0F6E56'}"></div>
+      <div class="disc-info">
+        <div class="disc-name">${d.nombre}</div>
+        <div class="disc-sub">Capacidad: ${d.capacidad} · Días: ${(d.dias||[]).map(x=>dayMap[x]||x).join(', ')} · Turnos: ${(d.turnos||[]).join(', ')} hs</div>
       </div>
-      <div style="font-size:11px;color:#888;margin-bottom:8px">Tocá una alumna para marcar presencia</div>
-      <div class="alumnas-list">${chips}</div>`;
-    c.appendChild(div);
+      <button class="icon-btn" onclick="openModal('disciplina','${d.id}')" title="Editar"><i class="ti ti-edit"></i></button>
+      <button class="icon-btn danger" onclick="deleteDisciplina('${d.id}')" title="Eliminar"><i class="ti ti-trash"></i></button>
+    </div>`).join('');
+}
+
+async function deleteDisciplina(id){
+  if(!confirm('¿Eliminar esta disciplina?'))return;
+  await sb.from('disciplinas').delete().eq('id',id);
+  disciplinas=disciplinas.filter(d=>d.id!==id);
+  toast('Disciplina eliminada');renderDisciplinas();renderAgenda(currentDay);updateMetrics();buildDayTabs();
+}
+
+function renderAsistencias(day){
+  currentAsistDay=day;
+  const c=document.getElementById('asist-container');
+  const dayDiscs=disciplinas.filter(d=>(d.dias||[]).includes(day));
+  if(!dayDiscs.length){c.innerHTML='<div class="empty-state"><i class="ti ti-clipboard-off"></i><p>No hay disciplinas para este día.</p></div>';return;}
+  const hoy=new Date().toISOString().slice(0,10);
+  c.innerHTML='';
+  dayDiscs.forEach(disc=>{
+    (disc.turnos||[]).forEach(turno=>{
+      const ins=alumnas.filter(a=>a.disciplina_id===disc.id&&a.turno===turno);
+      if(!ins.length)return;
+      const div=document.createElement('div');
+      div.className='slot';
+      const chips=ins.map(a=>{
+        const reg=asistencias.find(x=>x.alumna_id===a.id&&x.fecha===hoy&&x.turno===turno);
+        const st=reg?.estado||'sin';
+        return `<span class="asist-chip ${st==='asistio'?'asistio':st==='ausente'?'ausente':''}" onclick="toggleAsist('${a.id}','${turno}','${a.nombre}')">${a.nombre.split(' ')[0]}</span>`;
+      }).join('');
+      div.innerHTML=`
+        <div class="slot-header">
+          <div class="slot-time"><i class="ti ti-clock"></i> ${turno} hs</div>
+          <span class="slot-type" style="background:${disc.color||'#0F6E56'}">${disc.nombre}</span>
+        </div>
+        <div style="font-size:11px;color:#888;margin-bottom:8px">Tocá una alumna para marcar presencia</div>
+        <div class="alumnas-list">${chips}</div>`;
+      c.appendChild(div);
+    });
   });
 }
 
-function toggleAsist(key,nombre){
-  const cur=asistencias[key]||'sin';
-  const next=cur==='sin'?'asistio':cur==='asistio'?'ausente':'sin';
-  asistencias[key]=next;
-  const msg=next==='asistio'?`${nombre.split(' ')[0]} — presente ✓`:next==='ausente'?`${nombre.split(' ')[0]} — ausente`:`${nombre.split(' ')[0]} — sin marcar`;
-  toast(msg);
+async function toggleAsist(alumnaId,turno,nombre){
+  const hoy=new Date().toISOString().slice(0,10);
+  const idx=asistencias.findIndex(x=>x.alumna_id===alumnaId&&x.fecha===hoy&&x.turno===turno);
+  const cycle={sin:'asistio',asistio:'ausente',ausente:'sin'};
+  const cur=idx>=0?asistencias[idx].estado:'sin';
+  const next=cycle[cur];
+  if(idx>=0){
+    asistencias[idx].estado=next;
+    await sb.from('asistencias').update({estado:next}).eq('id',asistencias[idx].id);
+  } else {
+    const{data}=await sb.from('asistencias').insert({centro_id:currentUser.id,alumna_id:alumnaId,fecha:hoy,turno,estado:next}).select().single();
+    if(data) asistencias.push(data);
+  }
+  toast(`${nombre.split(' ')[0]} — ${next==='asistio'?'presente ✓':next==='ausente'?'ausente':'sin marcar'}`);
   renderAsistencias(currentAsistDay);
 }
 
 function showAsistDay(day,btn){
-  currentAsistDay=day;
-  document.querySelectorAll('#screen-asistencias .day-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#day-tabs-asist .day-tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderAsistencias(day);
+}
+
+function buildStats(){
+  const el=document.getElementById('stats-asist');
+  if(!disciplinas.length){el.innerHTML='';return;}
+  const total=asistencias.length||1;
+  const byDisc=disciplinas.map(d=>{
+    const discAlumnas=alumnas.filter(a=>a.disciplina_id===d.id).map(a=>a.id);
+    const pres=asistencias.filter(x=>discAlumnas.includes(x.alumna_id)&&x.estado==='asistio').length;
+    const tot=asistencias.filter(x=>discAlumnas.includes(x.alumna_id)).length||1;
+    return{nombre:d.nombre,color:d.color||'#1D9E75',pct:Math.round(pres/tot*100)};
+  });
+  el.innerHTML=`<div class="stat-card"><div class="stat-title">Asistencia por disciplina</div>${byDisc.map(d=>`<div class="bar-row"><div class="bar-label">${d.nombre}</div><div class="bar-track"><div class="bar-fill" style="width:${d.pct}%;background:${d.color}"></div></div><div class="bar-val">${d.pct}%</div></div>`).join('')}</div>`;
+}
+
+function renderFinanzas(){
+  const mes=new Date().getMonth()+1;
+  const año=new Date().getFullYear();
+  const mesF=finanzas.filter(f=>new Date(f.fecha).getMonth()+1===mes&&new Date(f.fecha).getFullYear()===año);
+  const ing=mesF.filter(f=>f.tipo==='ingreso').reduce((s,f)=>s+Number(f.monto),0);
+  const gas=mesF.filter(f=>f.tipo==='gasto').reduce((s,f)=>s+Number(f.monto),0);
+  document.getElementById('fin-metrics').innerHTML=`
+    <div class="met"><div class="met-n teal">$${ing.toLocaleString()}</div><div class="met-l">Ingresos del mes</div></div>
+    <div class="met"><div class="met-n coral">$${gas.toLocaleString()}</div><div class="met-l">Gastos del mes</div></div>
+    <div class="met"><div class="met-n purple">$${(ing-gas).toLocaleString()}</div><div class="met-l">Resultado neto</div></div>`;
+  const list=document.getElementById('fin-list');
+  if(!finanzas.length){list.innerHTML='<div class="empty-state"><i class="ti ti-report-money"></i><p>No hay movimientos registrados.</p></div>';return;}
+  list.innerHTML=finanzas.slice(0,20).map(f=>`
+    <div class="fin-item">
+      <div class="fin-icon ${f.tipo}"><i class="ti ti-${f.tipo==='ingreso'?'arrow-up':'arrow-down'}"></i></div>
+      <div class="fin-info"><div class="fin-desc">${f.descripcion}</div><div class="fin-fecha">${f.fecha}</div></div>
+      <div class="fin-val ${f.tipo==='ingreso'?'ing':'gasto'}">${f.tipo==='ingreso'?'+':'-'}$${Number(f.monto).toLocaleString()}</div>
+      <button class="icon-btn danger" onclick="deleteFinanza('${f.id}')"><i class="ti ti-trash"></i></button>
+    </div>`).join('');
+}
+
+async function deleteFinanza(id){
+  if(!confirm('¿Eliminar este movimiento?'))return;
+  await sb.from('finanzas').delete().eq('id',id);
+  finanzas=finanzas.filter(f=>f.id!==id);
+  renderFinanzas();updateMetrics();
 }
 
 function renderCuotas(){
   const pLabel={'al-dia':'Al día',pendiente:'Pendiente',vencido:'Vencido'};
   const pClass={'al-dia':'sb-al-dia',pendiente:'sb-pendiente',vencido:'sb-vencido'};
-  const labels={reformer:'Pilates Reformer',reset:'Viernes Reset',yoga:'Yoga'};
-  const sorted=[...alumnas].sort((a,b)=>{const o={vencido:0,pendiente:1,'al-dia':2};return o[a.pago]-o[b.pago]});
+  const discMap={};disciplinas.forEach(d=>discMap[d.id]=d);
+  const sorted=[...alumnas].sort((a,b)=>{const o={vencido:0,pendiente:1,'al-dia':2};return(o[a.pago]||1)-(o[b.pago]||1)});
   document.getElementById('cuotas-list').innerHTML=sorted.map(a=>`
     <div class="alumna-row">
-      <div class="av ${avatarColor(a.id)}">${initials(a.nombre)}</div>
-      <div class="alumna-info">
-        <div class="alumna-name">${a.nombre}</div>
-        <div class="alumna-sub">${labels[a.modal]}</div>
-      </div>
-      <div class="pago-col">$${a.cuota.toLocaleString()}</div>
-      <span class="status-badge ${pClass[a.pago]}" onclick="togglePagoAlumna(${a.id})">${pLabel[a.pago]}</span>
+      <div class="av">${initials(a.nombre)}</div>
+      <div class="alumna-info"><div class="alumna-name">${a.nombre}</div><div class="alumna-sub">${discMap[a.disciplina_id]?.nombre||'Sin disciplina'}</div></div>
+      <div class="pago-col">$${Number(a.cuota).toLocaleString()}</div>
+      <span class="status-badge ${pClass[a.pago]||'sb-pendiente'}" onclick="togglePago('${a.id}')">${pLabel[a.pago]||'Pendiente'}</span>
     </div>`).join('');
-  document.getElementById('m-pendientes').textContent=alumnas.filter(a=>a.pago!=='al-dia').length;
 }
 
-function togglePagoAlumna(id){
-  const a=alumnas.find(x=>x.id===id);
-  if(!a) return;
-  const cycle={'al-dia':'pendiente',pendiente:'vencido',vencido:'al-dia'};
-  a.pago=cycle[a.pago];
-  toast(`${a.nombre.split(' ')[0]} — ${a.pago==='al-dia'?'al día':a.pago}`);
-  renderCuotas(); renderAlumnas();
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const map={agenda:0,alumnas:1,asistencias:2,finanzas:3,disciplinas:4};
+  if(map[id]!==undefined) document.querySelectorAll('.nav-btn')[map[id]].classList.add('active');
+  if(id==='asistencias') renderAsistencias(currentAsistDay);
 }
 
-function openModal(){document.getElementById('modal-overlay').classList.add('open')}
+function openModal(type,id=null){
+  editingId=id;
+  const overlay=document.getElementById('modal-overlay');
+  const content=document.getElementById('modal-content');
+  overlay.classList.add('open');
+  if(type==='alumna') content.innerHTML=buildAlumnaModal(id);
+  if(type==='disciplina') content.innerHTML=buildDisciplinaModal(id);
+  if(type==='finanza') content.innerHTML=buildFinanzaModal();
+}
+
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open')}
 
-function agregarAlumna(){
-  const nombre=document.getElementById('new-nombre').value.trim();
-  if(!nombre){toast('Ingresá el nombre');return;}
-  const modal=document.getElementById('new-modal').value;
-  const turno=document.getElementById('new-turno').value;
-  const tel=document.getElementById('new-tel').value.trim()||'Sin teléfono';
-  const cuota=parseInt(document.getElementById('new-cuota').value)||5000;
-  const pago=document.getElementById('new-pago').value;
-  alumnas.push({id:Date.now(),nombre,modal,turno,tel,cuota,pago,asist:0});
-  document.getElementById('m-total').textContent=alumnas.length;
-  closeModal();
-  toast(`${nombre.split(' ')[0]} agregada`);
-  renderAlumnas();
+function buildAlumnaModal(id){
+  const a=id?alumnas.find(x=>x.id===id):null;
+  const discOpts=disciplinas.map(d=>`<option value="${d.id}" ${a?.disciplina_id===d.id?'selected':''}>${d.nombre}</option>`).join('');
+  const turnoOpts=(a?disciplinas.find(d=>d.id===a.disciplina_id)?.turnos||[]:disciplinas[0]?.turnos||[]).map(t=>`<option ${a?.turno===t?'selected':''}>${t}</option>`).join('');
+  return`<div class="modal-title"><i class="ti ti-${a?'edit':'user-plus'}"></i> ${a?'Editar':'Nueva'} alumna</div>
+    <div class="form-group"><label class="form-label">Nombre completo</label><input type="text" id="f-nombre" value="${a?.nombre||''}" placeholder="Ej: María González"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Disciplina</label><select id="f-disc" onchange="updateTurnos()">${discOpts}</select></div>
+      <div class="form-group"><label class="form-label">Turno</label><select id="f-turno">${turnoOpts}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Teléfono WhatsApp</label><input type="text" id="f-tel" value="${a?.telefono||''}" placeholder="Ej: 351 123-4567"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Cuota mensual ($)</label><input type="number" id="f-cuota" value="${a?.cuota||''}" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Estado de pago</label><select id="f-pago"><option value="al-dia" ${a?.pago==='al-dia'?'selected':''}>Al día</option><option value="pendiente" ${a?.pago==='pendiente'?'selected':''}>Pendiente</option><option value="vencido" ${a?.pago==='vencido'?'selected':''}>Vencido</option></select></div>
+    </div>
+    <button class="btn-primary" onclick="saveAlumna()"><i class="ti ti-check"></i> Guardar</button>
+    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>`;
+}
+
+function updateTurnos(){
+  const discId=document.getElementById('f-disc').value;
+  const disc=disciplinas.find(d=>d.id===discId);
+  const sel=document.getElementById('f-turno');
+  sel.innerHTML=(disc?.turnos||[]).map(t=>`<option>${t}</option>`).join('');
+}
+
+async function saveAlumna(){
+  const nombre=document.getElementById('f-nombre').value.trim();
+  if(!nombre){toast('Ingresá el nombre','err');return;}
+  const data={
+    centro_id:currentUser.id,
+    nombre,
+    disciplina_id:document.getElementById('f-disc')?.value||null,
+    turno:document.getElementById('f-turno')?.value||null,
+    telefono:document.getElementById('f-tel').value.trim()||null,
+    cuota:parseFloat(document.getElementById('f-cuota').value)||0,
+    pago:document.getElementById('f-pago').value
+  };
+  if(editingId){
+    await sb.from('alumnas').update(data).eq('id',editingId);
+    const idx=alumnas.findIndex(a=>a.id===editingId);
+    if(idx>=0) alumnas[idx]={...alumnas[idx],...data};
+    toast(`${nombre.split(' ')[0]} actualizada`,'ok');
+  } else {
+    const{data:nd}=await sb.from('alumnas').insert(data).select().single();
+    if(nd) alumnas.push(nd);
+    toast(`${nombre.split(' ')[0]} agregada`,'ok');
+  }
+  closeModal();renderAlumnas();renderAgenda(currentDay);updateMetrics();
+}
+
+function buildDisciplinaModal(id){
+  const d=id?disciplinas.find(x=>x.id===id):null;
+  const daysList=['lun','mar','mie','jue','vie','sab'];
+  const dayLabel={lun:'Lunes',mar:'Martes',mie:'Miércoles',jue:'Jueves',vie:'Viernes',sab:'Sábado'};
+  const diasHTML=daysList.map(day=>`<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" value="${day}" ${(d?.dias||[]).includes(day)?'checked':''}> ${dayLabel[day]}</label>`).join('');
+  return`<div class="modal-title"><i class="ti ti-${d?'edit':'plus'}"></i> ${d?'Editar':'Nueva'} disciplina</div>
+    <div class="form-group"><label class="form-label">Nombre</label><input type="text" id="d-nombre" value="${d?.nombre||''}" placeholder="Ej: Pilates Reformer"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Capacidad (lugares)</label><input type="number" id="d-cap" value="${d?.capacidad||3}" min="1" max="20"></div>
+      <div class="form-group"><label class="form-label">Color</label><input type="color" id="d-color" value="${d?.color||'#0F6E56'}" style="height:38px;padding:2px 4px"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Días de clase</label><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${diasHTML}</div></div>
+    <div class="form-group"><label class="form-label">Turnos (separados por coma)</label><input type="text" id="d-turnos" value="${(d?.turnos||[]).join(', ')}" placeholder="Ej: 08:00, 13:15, 17:00"></div>
+    <button class="btn-primary" onclick="saveDisciplina()"><i class="ti ti-check"></i> Guardar</button>
+    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>`;
+}
+
+async function saveDisciplina(){
+  const nombre=document.getElementById('d-nombre').value.trim();
+  if(!nombre){toast('Ingresá el nombre','err');return;}
+  const dias=Array.from(document.querySelectorAll('#modal-content input[type=checkbox]:checked')).map(c=>c.value);
+  const turnos=document.getElementById('d-turnos').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const data={
+    centro_id:currentUser.id,
+    nombre,
+    capacidad:parseInt(document.getElementById('d-cap').value)||3,
+    color:document.getElementById('d-color').value,
+    dias,turnos
+  };
+  if(editingId){
+    await sb.from('disciplinas').update(data).eq('id',editingId);
+    const idx=disciplinas.findIndex(d=>d.id===editingId);
+    if(idx>=0) disciplinas[idx]={...disciplinas[idx],...data};
+    toast('Disciplina actualizada','ok');
+  } else {
+    const{data:nd}=await sb.from('disciplinas').insert(data).select().single();
+    if(nd) disciplinas.push(nd);
+    toast('Disciplina creada','ok');
+  }
+  closeModal();renderDisciplinas();buildDayTabs();renderAgenda(currentDay);updateMetrics();
+}
+
+function buildFinanzaModal(){
+  return`<div class="modal-title"><i class="ti ti-report-money"></i> Nuevo movimiento</div>
+    <div class="form-group"><label class="form-label">Tipo</label><select id="fin-tipo"><option value="ingreso">Ingreso</option><option value="gasto">Gasto</option></select></div>
+    <div class="form-group"><label class="form-label">Descripción</label><input type="text" id="fin-desc" placeholder="Ej: Cuota marzo · Alquiler"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Monto ($)</label><input type="number" id="fin-monto" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">Fecha</label><input type="date" id="fin-fecha" value="${new Date().toISOString().slice(0,10)}"></div>
+    </div>
+    <button class="btn-primary" onclick="saveFinanza()"><i class="ti ti-check"></i> Guardar</button>
+    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>`;
+}
+
+async function saveFinanza(){
+  const desc=document.getElementById('fin-desc').value.trim();
+  const monto=parseFloat(document.getElementById('fin-monto').value);
+  if(!desc||!monto){toast('Completá todos los campos','err');return;}
+  const data={
+    centro_id:currentUser.id,
+    tipo:document.getElementById('fin-tipo').value,
+    descripcion:desc,monto,
+    fecha:document.getElementById('fin-fecha').value
+  };
+  const{data:nd}=await sb.from('finanzas').insert(data).select().single();
+  if(nd) finanzas.unshift(nd);
+  closeModal();toast('Movimiento guardado','ok');renderFinanzas();updateMetrics();
 }
 
 document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal()});
-renderAgenda('lun');
-renderAlumnas();
+
+sb.auth.onAuthStateChange(async(event,session)=>{
+  if(session?.user){
+    currentUser=session.user;
+    document.getElementById('auth-wrap').classList.add('hidden');
+    document.getElementById('app-wrap').classList.remove('hidden');
+    await loadAppData();
+  } else {
+    currentUser=null;
+    document.getElementById('app-wrap').classList.add('hidden');
+    document.getElementById('auth-wrap').classList.remove('hidden');
+  }
+});
 </script>
 </body>
 </html>
