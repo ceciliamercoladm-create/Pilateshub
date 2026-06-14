@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PilatesHub · Tu estudio</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F5F5F0;color:#1a1a1a;font-size:14px}
+.topbar{background:#fff;border-bottom:1px solid #e5e5e0;padding:0 1.5rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:16px;font-weight:500}.logo span{color:#0F6E56}
+.nav{display:flex;gap:4px;background:#F5F5F0;border-radius:8px;padding:3px}
+.nav-btn{font-size:12px;padding:5px 12px;border:none;background:transparent;border-radius:6px;cursor:pointer;color:#666;font-family:inherit;transition:all 0.15s;display:flex;align-items:center;gap:5px}
+.nav-btn.active{background:#fff;color:#1a1a1a;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.main{max-width:800px;margin:0 auto;padding:1.5rem}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
+.met{background:#fff;border-radius:10px;padding:1rem;text-align:center;border:1px solid #e5e5e0}
+.met-n{font-size:22px;font-weight:500}.met-l{font-size:11px;color:#888;margin-top:2px}
+.met-n.teal{color:#0F6E56}.met-n.amber{color:#854F0B}.met-n.coral{color:#993C1D}.met-n.purple{color:#534AB7}
+.screen{display:none}.screen.active{display:block}
+.day-tabs{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.day-tab{font-size:12px;padding:5px 14px;border:1px solid #e0e0e0;border-radius:20px;cursor:pointer;background:#fff;color:#666;font-family:inherit}
+.day-tab.active{background:#E1F5EE;color:#085041;border-color:#5DCAA5;font-weight:500}
+.day-tab.friday{border-color:#AFA9EC}.day-tab.friday.active{background:#EEEDFE;color:#3C3489;border-color:#7F77DD;font-weight:500}
+.slots{display:flex;flex-direction:column;gap:10px}
+.slot{background:#fff;border:1px solid #e5e5e0;border-radius:12px;padding:1rem}
+.slot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.slot-time{font-size:14px;font-weight:500;display:flex;align-items:center;gap:5px}
+.slot-type{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500}
+.st-reformer{background:#E1F5EE;color:#085041}.st-reset{background:#EEEDFE;color:#3C3489}.st-yoga{background:#FAEEDA;color:#633806}
+.cupos-bar{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.cupo{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border:1px solid #e0e0e0;cursor:pointer}
+.cupo.libre{background:#F5F5F0;color:#aaa}.cupo.ocupado{background:#E1F5EE;color:#085041;border-color:#5DCAA5}.cupo.ocupado-v{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC}
+.cupo-label{font-size:11px;color:#888;margin-left:4px}
+.alumnas-list{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.alumna-chip{font-size:11px;padding:3px 9px;border-radius:12px;background:#F5F5F0;color:#555;cursor:pointer;border:1px solid #e5e5e0}
+.alumna-chip.asistio{background:#E1F5EE;color:#085041;border-color:#5DCAA5}
+.alumna-chip.ausente{background:#FCEBEB;color:#791F1F;border-color:#F09595}
+.slot-footer{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid #f0f0f0}
+.libre-count{font-size:12px;color:#888}.libre-count span{font-weight:500;color:#0F6E56}
+.add-btn{font-size:11px;padding:4px 10px;border:1px solid #5DCAA5;border-radius:12px;background:#E1F5EE;color:#085041;cursor:pointer;font-family:inherit}
+.section-title{font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#888;margin-bottom:0.75rem;padding-bottom:0.5rem;border-bottom:1px solid #f0f0f0;margin-top:1.25rem}
+.alumna-grid{display:flex;flex-direction:column;gap:6px}
+.alumna-row{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:0.75rem 1rem;display:flex;align-items:center;gap:10px}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+.av-t{background:#E1F5EE;color:#0F6E56}.av-p{background:#EEEDFE;color:#534AB7}.av-a{background:#FAEEDA;color:#854F0B}.av-c{background:#FBEAF0;color:#993556}
+.alumna-info{flex:1;min-width:0}.alumna-name{font-size:13px;font-weight:500}.alumna-sub{font-size:11px;color:#888;margin-top:1px}
+.status-badge{font-size:11px;padding:3px 8px;border-radius:12px;font-weight:500;flex-shrink:0;cursor:pointer}
+.sb-al-dia{background:#E1F5EE;color:#085041}.sb-pendiente{background:#FAEEDA;color:#633806}.sb-vencido{background:#FCEBEB;color:#791F1F}
+.pago-col{font-size:12px;color:#888;text-align:right;min-width:70px}.asist-col{font-size:12px;color:#888;text-align:center;min-width:50px}
+.filter-row{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.filter-btn{font-size:11px;padding:4px 10px;border:1px solid #e5e5e0;border-radius:12px;background:#fff;color:#666;cursor:pointer;font-family:inherit}
+.filter-btn.active{background:#E1F5EE;color:#085041;border-color:#5DCAA5;font-weight:500}
+.top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:400px;margin:1rem}
+.modal-title{font-size:15px;font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.form-group{margin-bottom:0.875rem}
+.form-label{font-size:12px;color:#666;margin-bottom:4px;display:block}
+.form-group input,.form-group select{width:100%;font-size:13px;padding:8px 10px;border:1px solid #e0e0e0;border-radius:8px;font-family:inherit;background:#fff;color:#1a1a1a}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn-primary{background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;width:100%;margin-top:0.5rem}
+.btn-secondary{background:#F5F5F0;color:#666;border:1px solid #e5e5e0;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;margin-top:6px}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:300;opacity:0;transition:opacity 0.2s;pointer-events:none}
+.toast.show{opacity:1}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat-card{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:1rem}
+.stat-title{font-size:11px;color:#888;margin-bottom:0.75rem;font-weight:500;text-transform:uppercase;letter-spacing:0.07em}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-label{font-size:11px;color:#888;width:60px;flex-shrink:0}
+.bar-track{flex:1;height:6px;background:#F5F5F0;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:#1D9E75}
+.bar-val{font-size:11px;font-weight:500;color:#0F6E56;width:30px;text-align:right}
+.fin-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f0;font-size:13px}
+.fin-row:last-child{border-bottom:none}
+.fin-label{color:#666}.fin-val{font-weight:500}
+.fin-val.ing{color:#0F6E56}.fin-val.gasto{color:#A32D2D}.fin-val.neto{color:#185FA5}
+.week-nav{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+.week-label{font-size:13px;font-weight:500;flex:1;text-align:center}
+.week-btn{background:#fff;border:1px solid #e5e5e0;border-radius:8px;padding:4px 12px;cursor:pointer;font-family:inherit;font-size:12px;color:#666}
+@media(max-width:600px){.metrics{grid-template-columns:repeat(2,1fr)}.nav-btn span{display:none}.stats-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Pilates<span>Hub</span></div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showScreen('agenda')"><i class="ti ti-calendar"></i> <span>Agenda</span></button>
+    <button class="nav-btn" onclick="showScreen('alumnas')"><i class="ti ti-users"></i> <span>Alumnas</span></button>
+    <button class="nav-btn" onclick="showScreen('asistencias')"><i class="ti ti-clipboard-check"></i> <span>Asistencias</span></button>
+    <button class="nav-btn" onclick="showScreen('finanzas')"><i class="ti ti-chart-bar"></i> <span>Finanzas</span></button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="metrics">
+    <div class="met"><div class="met-n teal" id="m-total">45</div><div class="met-l">Alumnas activas</div></div>
+    <div class="met"><div class="met-n amber" id="m-pendientes">4</div><div class="met-l">Cuotas pendientes</div></div>
+    <div class="met"><div class="met-n coral" id="m-libres">8</div><div class="met-l">Lugares libres hoy</div></div>
+    <div class="met"><div class="met-n purple">16</div><div class="met-l">Clases esta semana</div></div>
+  </div>
+
+  <div id="screen-agenda" class="screen active">
+    <div class="week-nav">
+      <button class="week-btn"><i class="ti ti-chevron-left"></i></button>
+      <div class="week-label">Semana del 9 al 13 de junio · 2026</div>
+      <button class="week-btn"><i class="ti ti-chevron-right"></i></button>
+    </div>
+    <div class="day-tabs">
+      <button class="day-tab active" onclick="showDay('lun',this)">Lunes</button>
+      <button class="day-tab" onclick="showDay('mar',this)">Martes</button>
+      <button class="day-tab" onclick="showDay('mie',this)">Miércoles</button>
+      <button class="day-tab" onclick="showDay('jue',this)">Jueves</button>
+      <button class="day-tab friday" onclick="showDay('vie',this)">Viernes · Reset</button>
+    </div>
+    <div id="slots-container" class="slots"></div>
+  </div>
+
+  <div id="screen-alumnas" class="screen">
+    <div class="top-row">
+      <div class="filter-row" style="margin-bottom:0">
+        <button class="filter-btn active" onclick="filterAlumnas('todas',this)">Todas</button>
+        <button class="filter-btn" onclick="filterAlumnas('reformer',this)">Reformer</button>
+        <button class="filter-btn" onclick="filterAlumnas('reset',this)">Viernes Reset</button>
+        <button class="filter-btn" onclick="filterAlumnas('yoga',this)">Yoga</button>
+        <button class="filter-btn" onclick="filterAlumnas('pendiente',this)">Cuota pendiente</button>
+      </div>
+      <button class="add-btn" onclick="openModal()" style="padding:6px 14px;font-size:12px"><i class="ti ti-plus"></i> Nueva alumna</button>
+    </div>
+    <div id="alumna-grid" class="alumna-grid"></div>
+  </div>
+
+  <div id="screen-asistencias" class="screen">
+    <div class="day-tabs">
+      <button class="day-tab active" onclick="showAsistDay('lun',this)">Lunes</button>
+      <button class="day-tab" onclick="showAsistDay('mar',this)">Martes</button>
+      <button class="day-tab" onclick="showAsistDay('mie',this)">Miércoles</button>
+      <button class="day-tab" onclick="showAsistDay('jue',this)">Jueves</button>
+      <button class="day-tab friday" onclick="showAsistDay('vie',this)">Viernes</button>
+    </div>
+    <div id="asist-container" class="slots"></div>
+    <div class="section-title" style="margin-top:1.5rem">Estadísticas del mes</div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Asistencia por turno</div>
+        <div class="bar-row"><div class="bar-label">08:00 hs</div><div class="bar-track"><div class="bar-fill" style="width:90%"></div></div><div class="bar-val">90%</div></div>
+        <div class="bar-row"><div class="bar-label">13:15 hs</div><div class="bar-track"><div class="bar-fill" style="width:75%"></div></div><div class="bar-val">75%</div></div>
+        <div class="bar-row"><div class="bar-label">14:10 hs</div><div class="bar-track"><div class="bar-fill" style="width:83%"></div></div><div class="bar-val">83%</div></div>
+        <div class="bar-row"><div class="bar-label">15:00 hs</div><div class="bar-track"><div class="bar-fill" style="width:67%"></div></div><div class="bar-val">67%</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Por modalidad</div>
+        <div class="bar-row"><div class="bar-label">Reformer</div><div class="bar-track"><div class="bar-fill" style="width:82%"></div></div><div class="bar-val">82%</div></div>
+        <div class="bar-row"><div class="bar-label">Reset</div><div class="bar-track"><div class="bar-fill" style="width:78%;background:#7F77DD"></div></div><div class="bar-val">78%</div></div>
+        <div class="bar-row"><div class="bar-label">Yoga</div><div class="bar-track"><div class="bar-fill" style="width:95%;background:#BA7517"></div></div><div class="bar-val">95%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-finanzas" class="screen">
+    <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+      <div class="met"><div class="met-n teal">$187.500</div><div class="met-l">Ingresos junio</div></div>
+      <div class="met"><div class="met-n coral">$32.000</div><div class="met-l">Gastos junio</div></div>
+      <div class="met"><div class="met-n purple">$155.500</div><div class="met-l">Resultado neto</div></div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-title">Ingresos por modalidad</div>
+        <div class="bar-row"><div class="bar-label">Reformer</div><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><div class="bar-val">78%</div></div>
+        <div class="bar-row"><div class="bar-label">Reset</div><div class="bar-track"><div class="bar-fill" style="width:18%;background:#7F77DD"></div></div><div class="bar-val">18%</div></div>
+        <div class="bar-row"><div class="bar-label">Yoga</div><div class="bar-track"><div class="bar-fill" style="width:4%;background:#BA7517"></div></div><div class="bar-val">4%</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-title">Resumen del mes</div>
+        <div class="fin-row"><div class="fin-label">Cuotas cobradas</div><div class="fin-val ing">$187.500</div></div>
+        <div class="fin-row"><div class="fin-label">Alquiler</div><div class="fin-val gasto">-$18.000</div></div>
+        <div class="fin-row"><div class="fin-label">Servicios</div><div class="fin-val gasto">-$8.000</div></div>
+        <div class="fin-row"><div class="fin-label">Insumos</div><div class="fin-val gasto">-$6.000</div></div>
+        <div class="fin-row" style="border-top:2px solid #e5e5e0;margin-top:4px;padding-top:8px"><div class="fin-label" style="font-weight:500">Resultado</div><div class="fin-val neto">$155.500</div></div>
+      </div>
+    </div>
+    <div class="section-title">Estado de cuotas · Junio 2026</div>
+    <div id="cuotas-list" class="alumna-grid"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title"><i class="ti ti-user-plus"></i> Nueva alumna</div>
+    <div class="form-group">
+      <label class="form-label">Nombre completo</label>
+      <input type="text" id="new-nombre" placeholder="Ej: María González">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Modalidad</label>
+        <select id="new-modal">
+          <option value="reformer">Pilates Reformer</option>
+          <option value="reset">Viernes Reset</option>
+          <option value="yoga">Yoga</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Turno</label>
+        <select id="new-turno">
+          <option>08:00</option>
+          <option>13:15</option>
+          <option>14:10</option>
+          <option>15:00</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Teléfono WhatsApp</label>
+      <input type="text" id="new-tel" placeholder="Ej: 351 123-4567">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Cuota mensual ($)</label>
+        <input type="number" id="new-cuota" placeholder="Ej: 8500">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Estado de pago</label>
+        <select id="new-pago">
+          <option value="al-dia">Al día</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="agregarAlumna()"><i class="ti ti-check"></i> Guardar alumna</button>
+    <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TURNOS=['08:00','13:15','14:10','15:00'];
+const CAPS={reformer:3,reset:7,yoga:2};
+const COLORS=['av-t','av-p','av-a','av-c'];
+let currentDay='lun';
+let currentAsistDay='lun';
+let currentFilter='todas';
+let asistencias={};
+
+let alumnas=[
+  {id:1,nombre:'Sofía Martínez',modal:'reformer',turno:'08:00',tel:'351 111-0001',cuota:8500,pago:'al-dia',asist:18},
+  {id:2,nombre:'Valentina López',modal:'reformer',turno:'08:00',tel:'351 111-0002',cuota:8500,pago:'al-dia',asist:20},
+  {id:3,nombre:'Camila Torres',modal:'reformer',turno:'08:00',tel:'351 111-0003',cuota:8500,pago:'pendiente',asist:14},
+  {id:4,nombre:'Lucía Fernández',modal:'reformer',turno:'13:15',tel:'351 111-0004',cuota:8500,pago:'al-dia',asist:22},
+  {id:5,nombre:'Martina García',modal:'reformer',turno:'13:15',tel:'351 111-0005',cuota:8500,pago:'al-dia',asist:19},
+  {id:6,nombre:'Julieta Rodríguez',modal:'reformer',turno:'13:15',tel:'351 111-0006',cuota:8500,pago:'vencido',asist:8},
+  {id:7,nombre:'Ana Gómez',modal:'reformer',turno:'14:10',tel:'351 111-0007',cuota:8500,pago:'al-dia',asist:21},
+  {id:8,nombre:'Paula Herrera',modal:'reformer',turno:'14:10',tel:'351 111-0008',cuota:8500,pago:'al-dia',asist:23},
+  {id:9,nombre:'Florencia Díaz',modal:'reformer',turno:'14:10',tel:'351 111-0009',cuota:8500,pago:'pendiente',asist:16},
+  {id:10,nombre:'Romina Pérez',modal:'reformer',turno:'15:00',tel:'351 111-0010',cuota:8500,pago:'al-dia',asist:20},
+  {id:11,nombre:'Natalia Sosa',modal:'reformer',turno:'15:00',tel:'351 111-0011',cuota:8500,pago:'al-dia',asist:18},
+  {id:12,nombre:'Carolina Ruiz',modal:'reformer',turno:'15:00',tel:'351 111-0012',cuota:8500,pago:'al-dia',asist:22},
+  {id:13,nombre:'Agustina Vega',modal:'reset',turno:'08:00',tel:'351 111-0013',cuota:5500,pago:'al-dia',asist:17},
+  {id:14,nombre:'Daniela Moreno',modal:'reset',turno:'08:00',tel:'351 111-0014',cuota:5500,pago:'al-dia',asist:19},
+  {id:15,nombre:'Micaela Castro',modal:'reset',turno:'08:00',tel:'351 111-0015',cuota:5500,pago:'al-dia',asist:20},
+  {id:16,nombre:'Verónica Ríos',modal:'reset',turno:'08:00',tel:'351 111-0016',cuota:5500,pago:'pendiente',asist:12},
+  {id:17,nombre:'Laura Mendoza',modal:'reset',turno:'08:00',tel:'351 111-0017',cuota:5500,pago:'al-dia',asist:18},
+  {id:18,nombre:'Cecilia Vargas',modal:'reset',turno:'13:15',tel:'351 111-0018',cuota:5500,pago:'al-dia',asist:21},
+  {id:19,nombre:'Mariana Silva',modal:'reset',turno:'13:15',tel:'351 111-0019',cuota:5500,pago:'al-dia',asist:16},
+  {id:20,nombre:'Patricia Aguirre',modal:'reset',turno:'13:15',tel:'351 111-0020',cuota:5500,pago:'vencido',asist:5},
+  {id:21,nombre:'Graciela Ibáñez',modal:'reset',turno:'14:10',tel:'351 111-0021',cuota:5500,pago:'al-dia',asist:19},
+  {id:22,nombre:'Mónica Suárez',modal:'reset',turno:'15:00',tel:'351 111-0022',cuota:5500,pago:'al-dia',asist:17},
+  {id:23,nombre:'Adriana Flores',modal:'yoga',turno:'08:00',tel:'351 111-0023',cuota:4000,pago:'al-dia',asist:22},
+  {id:24,nombre:'Beatriz Romero',modal:'yoga',turno:'08:00',tel:'351 111-0024',cuota:4000,pago:'al-dia',asist:20},
+];
+
+function initials(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
+function avatarColor(id){return COLORS[id%4]}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const map={agenda:0,alumnas:1,asistencias:2,finanzas:3};
+  if(map[id]!==undefined) document.querySelectorAll('.nav-btn')[map[id]].classList.add('active');
+  if(id==='alumnas') renderAlumnas();
+  if(id==='finanzas') renderCuotas();
+  if(id==='asistencias') renderAsistencias(currentAsistDay);
+}
+
+function getBySlot(modal,turno){return alumnas.filter(a=>a.modal===modal&&a.turno===turno)}
+
+function renderAgenda(day){
+  const isVie=day==='vie';
+  const modal=isVie?'reset':'reformer';
+  const cap=CAPS[modal];
+  const typeLabel=isVie?'Viernes Reset':'Pilates Reformer';
+  const typeClass=isVie?'st-reset':'st-reformer';
+  const ocupClass=isVie?'ocupado-v':'ocupado';
+  const c=document.getElementById('slots-container');
+  c.innerHTML='';
+  TURNOS.forEach(t=>{
+    const ins=getBySlot(modal,t);
+    const libre=cap-ins.length;
+    let cuposHTML='';
+    for(let i=0;i<cap;i++){
+      const a=ins[i];
+      cuposHTML+=`<div class="cupo ${a?ocupClass:'libre'}" title="${a?a.nombre:'Libre'}">${a?initials(a.nombre):'+'}</div>`;
+    }
+    const alHTML=ins.map(a=>`<span class="alumna-chip">${a.nombre.split(' ')[0]}</span>`).join('');
+    const div=document.createElement('div');
+    div.className='slot';
+    div.innerHTML=`
+      <div class="slot-header">
+        <div class="slot-time"><i class="ti ti-clock"></i> ${t} hs</div>
+        <span class="slot-type ${typeClass}">${typeLabel}</span>
+      </div>
+      <div class="cupos-bar">${cuposHTML}<span class="cupo-label">${libre} lugar${libre!==1?'es':''} libre${libre!==1?'s':''}</span></div>
+      <div class="alumnas-list">${alHTML||'<span style="font-size:12px;color:#aaa">Sin alumnas asignadas</span>'}</div>
+      <div class="slot-footer">
+        <span class="libre-count"><span>${ins.length}</span>/${cap} ocupados</span>
+        ${libre>0?`<button class="add-btn" onclick="openModal()"><i class="ti ti-plus"></i> Agregar alumna</button>`:'<span style="font-size:11px;color:#993C1D;font-weight:500">Turno completo</span>'}
+      </div>`;
+    c.appendChild(div);
+  });
+}
+
+function showDay(day,btn){
+  currentDay=day;
+  document.querySelectorAll('#screen-agenda .day-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAgenda(day);
+}
+
+function renderAlumnas(){
+  let list=alumnas;
+  if(currentFilter==='reformer') list=alumnas.filter(a=>a.modal==='reformer');
+  else if(currentFilter==='reset') list=alumnas.filter(a=>a.modal==='reset');
+  else if(currentFilter==='yoga') list=alumnas.filter(a=>a.modal==='yoga');
+  else if(currentFilter==='pendiente') list=alumnas.filter(a=>a.pago!=='al-dia');
+  const labels={reformer:'Pilates Reformer',reset:'Viernes Reset',yoga:'Yoga'};
+  const pLabel={'al-dia':'Al día',pendiente:'Pendiente',vencido:'Vencido'};
+  const pClass={'al-dia':'sb-al-dia',pendiente:'sb-pendiente',vencido:'sb-vencido'};
+  document.getElementById('alumna-grid').innerHTML=list.map(a=>`
+    <div class="alumna-row">
+      <div class="av ${avatarColor(a.id)}">${initials(a.nombre)}</div>
+      <div class="alumna-info">
+        <div class="alumna-name">${a.nombre}</div>
+        <div class="alumna-sub">${labels[a.modal]} · ${a.turno} hs · ${a.tel}</div>
+      </div>
+      <div class="asist-col"><i class="ti ti-clipboard-check"></i> ${a.asist}</div>
+      <div class="pago-col">$${a.cuota.toLocaleString()}</div>
+      <span class="status-badge ${pClass[a.pago]}" onclick="togglePagoAlumna(${a.id})">${pLabel[a.pago]}</span>
+    </div>`).join('');
+}
+
+function filterAlumnas(f,btn){
+  currentFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAlumnas();
+}
+
+function renderAsistencias(day){
+  const isVie=day==='vie';
+  const modal=isVie?'reset':'reformer';
+  const c=document.getElementById('asist-container');
+  c.innerHTML='';
+  TURNOS.forEach(t=>{
+    const ins=getBySlot(modal,t);
+    if(!ins.length) return;
+    const div=document.createElement('div');
+    div.className='slot';
+    const chips=ins.map(a=>{
+      const key=`${day}-${t}-${a.id}`;
+      const st=asistencias[key]||'sin';
+      const cls=st==='asistio'?'alumna-chip asistio':st==='ausente'?'alumna-chip ausente':'alumna-chip';
+      return `<span class="${cls}" onclick="toggleAsist('${key}','${a.nombre}')">${a.nombre.split(' ')[0]}</span>`;
+    }).join('');
+    div.innerHTML=`
+      <div class="slot-header">
+        <div class="slot-time"><i class="ti ti-clock"></i> ${t} hs</div>
+        <span class="slot-type ${isVie?'st-reset':'st-reformer'}">${ins.length} alumnas</span>
+      </div>
+      <div style="font-size:11px;color:#888;margin-bottom:8px">Tocá una alumna para marcar presencia</div>
+      <div class="alumnas-list">${chips}</div>`;
+    c.appendChild(div);
+  });
+}
+
+function toggleAsist(key,nombre){
+  const cur=asistencias[key]||'sin';
+  const next=cur==='sin'?'asistio':cur==='asistio'?'ausente':'sin';
+  asistencias[key]=next;
+  const msg=next==='asistio'?`${nombre.split(' ')[0]} — presente ✓`:next==='ausente'?`${nombre.split(' ')[0]} — ausente`:`${nombre.split(' ')[0]} — sin marcar`;
+  toast(msg);
+  renderAsistencias(currentAsistDay);
+}
+
+function showAsistDay(day,btn){
+  currentAsistDay=day;
+  document.querySelectorAll('#screen-asistencias .day-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAsistencias(day);
+}
+
+function renderCuotas(){
+  const pLabel={'al-dia':'Al día',pendiente:'Pendiente',vencido:'Vencido'};
+  const pClass={'al-dia':'sb-al-dia',pendiente:'sb-pendiente',vencido:'sb-vencido'};
+  const labels={reformer:'Pilates Reformer',reset:'Viernes Reset',yoga:'Yoga'};
+  const sorted=[...alumnas].sort((a,b)=>{const o={vencido:0,pendiente:1,'al-dia':2};return o[a.pago]-o[b.pago]});
+  document.getElementById('cuotas-list').innerHTML=sorted.map(a=>`
+    <div class="alumna-row">
+      <div class="av ${avatarColor(a.id)}">${initials(a.nombre)}</div>
+      <div class="alumna-info">
+        <div class="alumna-name">${a.nombre}</div>
+        <div class="alumna-sub">${labels[a.modal]}</div>
+      </div>
+      <div class="pago-col">$${a.cuota.toLocaleString()}</div>
+      <span class="status-badge ${pClass[a.pago]}" onclick="togglePagoAlumna(${a.id})">${pLabel[a.pago]}</span>
+    </div>`).join('');
+  document.getElementById('m-pendientes').textContent=alumnas.filter(a=>a.pago!=='al-dia').length;
+}
+
+function togglePagoAlumna(id){
+  const a=alumnas.find(x=>x.id===id);
+  if(!a) return;
+  const cycle={'al-dia':'pendiente',pendiente:'vencido',vencido:'al-dia'};
+  a.pago=cycle[a.pago];
+  toast(`${a.nombre.split(' ')[0]} — ${a.pago==='al-dia'?'al día':a.pago}`);
+  renderCuotas(); renderAlumnas();
+}
+
+function openModal(){document.getElementById('modal-overlay').classList.add('open')}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open')}
+
+function agregarAlumna(){
+  const nombre=document.getElementById('new-nombre').value.trim();
+  if(!nombre){toast('Ingresá el nombre');return;}
+  const modal=document.getElementById('new-modal').value;
+  const turno=document.getElementById('new-turno').value;
+  const tel=document.getElementById('new-tel').value.trim()||'Sin teléfono';
+  const cuota=parseInt(document.getElementById('new-cuota').value)||5000;
+  const pago=document.getElementById('new-pago').value;
+  alumnas.push({id:Date.now(),nombre,modal,turno,tel,cuota,pago,asist:0});
+  document.getElementById('m-total').textContent=alumnas.length;
+  closeModal();
+  toast(`${nombre.split(' ')[0]} agregada`);
+  renderAlumnas();
+}
+
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal()});
+renderAgenda('lun');
+renderAlumnas();
+</script>
+</body>
+</html>
