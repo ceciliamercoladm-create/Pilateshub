@@ -6,6 +6,13 @@
 <title>PilatesHub · Gestión de tu estudio</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.addEventListener('load', function(){
+  if(typeof supabase === 'undefined'){
+    document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:sans-serif;color:#666"><div><p style="font-size:16px;margin-bottom:10px">⚠️ No se pudo cargar la conexión con la base de datos.</p><p style="font-size:13px;margin-bottom:16px">Esto suele pasar por una conexión a internet inestable.</p><button onclick="location.reload()" style="background:#0F6E56;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:13px">Reintentar</button></div></div>';
+  }
+});
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F5F5F0;color:#1a1a1a;font-size:14px}
