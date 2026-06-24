@@ -6,13 +6,6 @@
 <title>PilatesHub · Gestión de tu estudio</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-window.addEventListener('load', function(){
-  if(typeof supabase === 'undefined'){
-    document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;font-family:sans-serif;color:#666"><div><p style="font-size:16px;margin-bottom:10px">⚠️ No se pudo cargar la conexión con la base de datos.</p><p style="font-size:13px;margin-bottom:16px">Esto suele pasar por una conexión a internet inestable.</p><button onclick="location.reload()" style="background:#0F6E56;color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:13px">Reintentar</button></div></div>';
-  }
-});
-</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F5F5F0;color:#1a1a1a;font-size:14px}
@@ -29,7 +22,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .form-group input,.form-group select,.form-group textarea{width:100%;font-size:13px;padding:9px 11px;border:1px solid #e0e0e0;border-radius:8px;font-family:inherit;background:#fff;color:#1a1a1a;outline:none}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#5DCAA5}
 .btn-primary{background:#0F6E56;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;width:100%;margin-top:0.25rem}
-.btn-primary:hover{background:#0a5040}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed}
+.btn-primary:hover:not(:disabled){background:#0a5040}
 .btn-link{background:none;border:none;color:#0F6E56;font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline;margin-top:0.75rem;display:block;text-align:center}
 .auth-error{background:#FCEBEB;color:#791F1F;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:0.875rem;display:none}
 .auth-success{background:#E1F5EE;color:#085041;border-radius:8px;padding:8px 12px;font-size:12px;margin-bottom:0.875rem;display:none}
@@ -106,8 +100,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .modal-title{font-size:15px;font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .btn-secondary{background:#F5F5F0;color:#666;border:1px solid #e5e5e0;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;margin-top:6px}
-.btn-danger{background:#FCEBEB;color:#791F1F;border:1px solid #F09595;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;font-family:inherit;width:100%;margin-top:6px}
-.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .stat-card{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:1rem}
@@ -117,10 +110,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .bar-track{flex:1;height:6px;background:#F5F5F0;border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;background:#1D9E75}
 .bar-val{font-size:11px;font-weight:500;color:#0F6E56;width:30px;text-align:right}
-.fin-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f0;font-size:13px}
-.fin-row:last-child{border-bottom:none}
-.fin-label{color:#666}.fin-val{font-weight:500}
-.fin-val.ing{color:#0F6E56}.fin-val.gasto{color:#A32D2D}.fin-val.neto{color:#185FA5}
 .empty-state{text-align:center;padding:3rem 1rem;color:#888}
 .empty-state i{font-size:32px;display:block;margin-bottom:0.75rem;color:#ccc}
 .empty-state p{font-size:13px;margin-bottom:1rem}
@@ -141,14 +130,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .metodo-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;flex-shrink:0}
 .mb-efectivo{background:#E1F5EE;color:#085041}
 .mb-transferencia{background:#E6F1FB;color:#185FA5}
+.fin-val{font-weight:500}.fin-val.ing{color:#0F6E56}.fin-val.gasto{color:#A32D2D}
 .perfil-card{background:#fff;border:1px solid #e5e5e0;border-radius:12px;padding:1.5rem;margin-bottom:1rem}
 .perfil-logo{width:80px;height:80px;border-radius:12px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:500;color:#0F6E56;margin-bottom:1rem;overflow:hidden}
 .perfil-logo img{width:100%;height:100%;object-fit:cover;border-radius:12px}
-.logo-upload{font-size:11px;padding:4px 10px;border:1px solid #e5e5e0;border-radius:8px;background:#F5F5F0;color:#666;cursor:pointer;font-family:inherit;margin-bottom:1rem;display:inline-block}
-.dias-check-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.dias-check-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
 .dias-check-grid label{display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:#F5F5F0;padding:5px 10px;border-radius:8px;border:1px solid #e5e5e0}
-.dias-check-grid input:checked + span{font-weight:500}
 .alert-banner{background:#FAEEDA;border:1px solid #E5C77A;border-radius:10px;padding:0.75rem 1rem;font-size:12px;color:#633806;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.fatal-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center}
+.fatal-box{max-width:380px}
+.fatal-box p{font-size:14px;color:#666;margin-bottom:16px;line-height:1.5}
 @media(max-width:600px){.metrics{grid-template-columns:repeat(2,1fr)}.nav-btn span{display:none}.stats-grid{grid-template-columns:1fr}.topbar{padding:0 1rem}.centro-name{display:none}.notif-panel{right:0.5rem;width:calc(100vw - 1rem)}}
 </style>
 </head>
@@ -167,18 +158,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div id="tab-login">
       <div class="form-group"><label class="form-label">Email</label><input type="email" id="login-email" placeholder="tu@email.com"></div>
       <div class="form-group"><label class="form-label">Contraseña</label><input type="password" id="login-pass" placeholder="••••••••"></div>
-      <button class="btn-primary" onclick="doLogin()"><i class="ti ti-login"></i> Entrar</button>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()"><i class="ti ti-login"></i> Entrar</button>
       <button class="btn-link" onclick="switchAuthTab('recover')">Olvidé mi contraseña</button>
     </div>
     <div id="tab-register" class="hidden">
       <div class="form-group"><label class="form-label">Nombre de tu estudio</label><input type="text" id="reg-nombre" placeholder="Ej: Pilates Studio Córdoba"></div>
       <div class="form-group"><label class="form-label">Email</label><input type="email" id="reg-email" placeholder="tu@email.com"></div>
       <div class="form-group"><label class="form-label">Contraseña</label><input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"></div>
-      <button class="btn-primary" onclick="doRegister()"><i class="ti ti-user-plus"></i> Crear cuenta</button>
+      <button class="btn-primary" id="btn-register" onclick="doRegister()"><i class="ti ti-user-plus"></i> Crear cuenta</button>
     </div>
     <div id="tab-recover" class="hidden">
       <div class="form-group"><label class="form-label">Email de tu cuenta</label><input type="email" id="rec-email" placeholder="tu@email.com"></div>
-      <button class="btn-primary" onclick="doRecover()"><i class="ti ti-mail"></i> Enviar link de recuperación</button>
+      <button class="btn-primary" id="btn-recover" onclick="doRecover()"><i class="ti ti-mail"></i> Enviar link de recuperación</button>
       <button class="btn-link" onclick="switchAuthTab('login')">Volver al inicio de sesión</button>
     </div>
   </div>
@@ -201,7 +192,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         <i class="ti ti-bell"></i>
         <span class="notif-badge hidden" id="notif-badge">0</span>
       </button>
-      <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> Salir</button>
+      <button class="btn-logout" id="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> Salir</button>
     </div>
   </div>
 
@@ -225,7 +216,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div id="agenda-alert"></div>
       <div class="week-nav">
         <button class="week-btn"><i class="ti ti-chevron-left"></i></button>
-        <div class="week-label" id="week-label">Semana actual</div>
+        <div class="week-label">Agenda semanal</div>
         <button class="week-btn"><i class="ti ti-chevron-right"></i></button>
       </div>
       <div class="day-tabs" id="day-tabs-agenda"></div>
@@ -268,10 +259,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
     <div id="screen-perfil" class="screen">
       <div class="perfil-card">
-        <div class="section-title" style="margin-top:0">Logo del estudio</div>
-        <div class="perfil-logo" id="perfil-logo-preview">EO</div>
-        <label class="logo-upload"><i class="ti ti-upload"></i> Subir logo <input type="file" id="logo-input" accept="image/*" style="display:none" onchange="previewLogo(this)"></label>
-        <div class="section-title">Datos del estudio</div>
+        <div class="section-title" style="margin-top:0">Datos del estudio</div>
         <div class="form-group"><label class="form-label">Nombre del estudio</label><input type="text" id="p-nombre" placeholder="Nombre del estudio"></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Teléfono</label><input type="text" id="p-tel" placeholder="Ej: 351 123-4567"></div>
@@ -279,13 +267,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
         </div>
         <div class="form-group"><label class="form-label">Dirección</label><input type="text" id="p-dir" placeholder="Ej: Av. Colón 1234, Córdoba"></div>
         <div class="form-group"><label class="form-label">Descripción / Bio</label><textarea id="p-bio" rows="3" placeholder="Contá de qué se trata tu estudio..."></textarea></div>
-        <button class="btn-primary" onclick="savePerfil()"><i class="ti ti-check"></i> Guardar cambios</button>
+        <button class="btn-primary" id="btn-perfil" onclick="savePerfil()"><i class="ti ti-check"></i> Guardar cambios</button>
       </div>
       <div class="perfil-card">
         <div class="section-title" style="margin-top:0">Cambiar contraseña</div>
         <div class="form-group"><label class="form-label">Nueva contraseña</label><input type="password" id="p-pass" placeholder="Mínimo 6 caracteres"></div>
         <div class="form-group"><label class="form-label">Confirmar contraseña</label><input type="password" id="p-pass2" placeholder="Repetí la contraseña"></div>
-        <button class="btn-primary" onclick="savePassword()"><i class="ti ti-lock"></i> Cambiar contraseña</button>
+        <button class="btn-primary" id="btn-pass" onclick="savePassword()"><i class="ti ti-lock"></i> Cambiar contraseña</button>
       </div>
     </div>
   </div>
@@ -297,22 +285,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div class="toast" id="toast"></div>
 
 <script>
+/* ======= CONFIG ======= */
 const SUPABASE_URL='https://arsryamzkhwnnwtsaqgx.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyc3J5YW16a2h3bm53dHNhcWd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NDg0MjAsImV4cCI6MjA5NzAyNDQyMH0.8zSsqMOKJI_elEwWUKCznSuEuqymWEh2M2e6VD_b988';
+
+/* ======= FATAL GUARD: si Supabase no carga, mostrar mensaje en vez de colgar la app ======= */
+if(typeof supabase==='undefined'){
+  document.body.innerHTML='<div class="fatal-screen"><div class="fatal-box"><p><i class="ti ti-alert-triangle" style="font-size:28px;color:#854F0B;display:block;margin-bottom:10px"></i>No se pudo conectar con la base de datos. Esto suele pasar por una conexión a internet inestable.</p><button class="btn-primary" onclick="location.reload()">Reintentar</button></div></div>';
+  throw new Error('Supabase no cargó');
+}
+
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
+/* ======= ESTADO ======= */
 let currentUser=null,centroData=null,alumnas=[],disciplinas=[],finanzas=[],asistencias=[];
 let currentDay='lun',currentAsistDay='lun',currentFilter='todas',editingId=null,notifOpen=false;
 const DAYS=[{k:'lun',l:'Lunes'},{k:'mar',l:'Martes'},{k:'mie',l:'Miércoles'},{k:'jue',l:'Jueves'},{k:'vie',l:'Viernes'},{k:'sab',l:'Sábado'}];
 const DAY_LABEL={lun:'Lun',mar:'Mar',mie:'Mié',jue:'Jue',vie:'Vie',sab:'Sáb'};
+const DAY_LABEL_FULL={lun:'Lunes',mar:'Martes',mie:'Miércoles',jue:'Jueves',vie:'Viernes',sab:'Sábado'};
 
+/* ======= HELPERS ======= */
 function toast(msg,type='dark'){
   const t=document.getElementById('toast');
   t.textContent=msg;
   t.style.background=type==='ok'?'#0F6E56':type==='err'?'#A32D2D':'#1a1a1a';
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3200);
 }
-function initials(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
+function initials(n){return (n||'?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
+function setBtnLoading(id,loading,label){
+  const b=document.getElementById(id);
+  if(!b)return;
+  b.disabled=loading;
+  if(loading){ b.dataset.label=b.innerHTML; b.innerHTML='<i class="ti ti-loader-2"></i> Guardando...'; }
+  else { b.innerHTML=b.dataset.label||label||b.innerHTML; }
+}
+function logErr(ctx,error){ if(error) console.error('['+ctx+']',error); }
+
+/* ======= AUTH UI ======= */
 function showAuthError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.style.display='block';document.getElementById('auth-success').style.display='none';}
 function showAuthSuccess(msg){const el=document.getElementById('auth-success');el.textContent=msg;el.style.display='block';document.getElementById('auth-error').style.display='none';}
 function clearAuthMsg(){document.getElementById('auth-error').style.display='none';document.getElementById('auth-success').style.display='none';}
@@ -327,8 +337,12 @@ async function doLogin(){
   const email=document.getElementById('login-email').value.trim();
   const pass=document.getElementById('login-pass').value;
   if(!email||!pass){showAuthError('Completá todos los campos');return;}
-  const{error}=await sb.auth.signInWithPassword({email,password:pass});
-  if(error){showAuthError('Email o contraseña incorrectos');}
+  setBtnLoading('btn-login',true);
+  try{
+    const{error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error){showAuthError('Email o contraseña incorrectos');logErr('login',error);}
+  }catch(e){showAuthError('Error de conexión. Probá de nuevo.');logErr('login-catch',e);}
+  finally{setBtnLoading('btn-login',false,'<i class="ti ti-login"></i> Entrar');}
 }
 
 async function doRegister(){
@@ -337,85 +351,115 @@ async function doRegister(){
   const pass=document.getElementById('reg-pass').value;
   if(!nombre||!email||!pass){showAuthError('Completá todos los campos');return;}
   if(pass.length<6){showAuthError('La contraseña debe tener al menos 6 caracteres');return;}
-  const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{nombre_centro:nombre}}});
-  if(error){showAuthError('Error: '+error.message);return;}
-  if(data.user){await sb.from('centros').insert({id:data.user.id,nombre,email});}
-  showAuthSuccess('Cuenta creada. Revisá tu email para confirmar.');
+  setBtnLoading('btn-register',true);
+  try{
+    const{data,error}=await sb.auth.signUp({email,password:pass,options:{data:{nombre_centro:nombre}}});
+    if(error){showAuthError('Error: '+error.message);logErr('register',error);return;}
+    showAuthSuccess('Cuenta creada. Si tu proyecto pide confirmación, revisá tu email. Si no, ya podés iniciar sesión.');
+  }catch(e){showAuthError('Error de conexión. Probá de nuevo.');logErr('register-catch',e);}
+  finally{setBtnLoading('btn-register',false,'<i class="ti ti-user-plus"></i> Crear cuenta');}
 }
 
 async function doRecover(){
   const email=document.getElementById('rec-email').value.trim();
   if(!email){showAuthError('Ingresá tu email');return;}
-  const{error}=await sb.auth.resetPasswordForEmail(email);
-  if(error){showAuthError('Error: '+error.message);return;}
-  showAuthSuccess('Te enviamos un link para restablecer tu contraseña.');
+  setBtnLoading('btn-recover',true);
+  try{
+    const{error}=await sb.auth.resetPasswordForEmail(email);
+    if(error){showAuthError('Error: '+error.message);logErr('recover',error);return;}
+    showAuthSuccess('Te enviamos un link para restablecer tu contraseña.');
+  }catch(e){showAuthError('Error de conexión.');logErr('recover-catch',e);}
+  finally{setBtnLoading('btn-recover',false,'<i class="ti ti-mail"></i> Enviar link de recuperación');}
 }
 
 async function doLogout(){
-  try{await sb.auth.signOut();}catch(e){}
+  setBtnLoading('btn-logout',true);
+  try{ await sb.auth.signOut(); }catch(e){ logErr('logout',e); }
+  currentUser=null;centroData=null;alumnas=[];disciplinas=[];finanzas=[];asistencias=[];
   document.getElementById('app-wrap').classList.add('hidden');
   document.getElementById('auth-wrap').classList.remove('hidden');
-  alumnas=[];disciplinas=[];finanzas=[];asistencias=[];currentUser=null;centroData=null;
+  setBtnLoading('btn-logout',false,'<i class="ti ti-logout"></i> Salir');
 }
 
+/* ======= CARGA DE DATOS ======= */
 async function loadAppData(){
-  const[{data:c},{data:a},{data:d},{data:f},{data:as}]=await Promise.all([
-    sb.from('centros').select('*').eq('id',currentUser.id).single(),
-    sb.from('alumnas').select('*').eq('centro_id',currentUser.id).order('nombre'),
-    sb.from('disciplinas').select('*').eq('centro_id',currentUser.id).order('nombre'),
-    sb.from('finanzas').select('*').eq('centro_id',currentUser.id).order('fecha',{ascending:false}),
-    sb.from('asistencias').select('*').eq('centro_id',currentUser.id)
-  ]);
-  centroData=c;alumnas=a||[];disciplinas=d||[];finanzas=f||[];asistencias=as||[];
-  document.getElementById('centro-name').textContent=centroData?.nombre||'';
-  loadPerfilForm();
-  updateMetrics();
-  buildDayTabs();
-  renderAgenda(currentDay);
-  renderAlumnas();
-  renderDisciplinas();
-  renderFinanzas();
-  renderCuotas();
-  buildStats();
-  buildNotifications();
-  checkAlumnasSinDias();
+  try{
+    const[centroRes,alumnasRes,discRes,finRes,asistRes]=await Promise.all([
+      sb.from('centros').select('*').eq('id',currentUser.id).maybeSingle(),
+      sb.from('alumnas').select('*').eq('centro_id',currentUser.id).order('nombre'),
+      sb.from('disciplinas').select('*').eq('centro_id',currentUser.id).order('nombre'),
+      sb.from('finanzas').select('*').eq('centro_id',currentUser.id).order('fecha',{ascending:false}),
+      sb.from('asistencias').select('*').eq('centro_id',currentUser.id)
+    ]);
+    logErr('load-centro',centroRes.error);
+    logErr('load-alumnas',alumnasRes.error);
+    logErr('load-disciplinas',discRes.error);
+    logErr('load-finanzas',finRes.error);
+    logErr('load-asistencias',asistRes.error);
+
+    centroData=centroRes.data;
+    alumnas=alumnasRes.data||[];
+    disciplinas=discRes.data||[];
+    finanzas=finRes.data||[];
+    asistencias=asistRes.data||[];
+
+    // Si por algún motivo el trigger no creó el centro, lo creamos ahora desde el cliente
+    if(!centroData){
+      const{data:nd,error}=await sb.from('centros').insert({
+        id:currentUser.id,
+        nombre:currentUser.user_metadata?.nombre_centro||currentUser.email,
+        email:currentUser.email
+      }).select().maybeSingle();
+      logErr('fallback-create-centro',error);
+      centroData=nd||{id:currentUser.id,nombre:currentUser.email,email:currentUser.email};
+    }
+
+    document.getElementById('centro-name').textContent=centroData?.nombre||'';
+    loadPerfilForm();
+    updateMetrics();
+    buildDayTabs();
+    renderAgenda(currentDay);
+    renderAlumnas();
+    renderDisciplinas();
+    renderFinanzas();
+    renderCuotas();
+    buildStats();
+    buildNotifications();
+    checkAlumnasSinDias();
+  }catch(e){
+    logErr('loadAppData-catch',e);
+    toast('Hubo un problema cargando tus datos. Recargá la página.','err');
+  }
 }
 
 function checkAlumnasSinDias(){
   const sinDias=alumnas.filter(a=>a.disciplina_id&&(!a.dias||a.dias.length===0));
   const el=document.getElementById('agenda-alert');
-  if(sinDias.length){
-    el.innerHTML=`<div class="alert-banner"><i class="ti ti-alert-triangle"></i> ${sinDias.length} alumna${sinDias.length>1?'s':''} sin días asignados — no aparecen en la agenda hasta que les asignes días en "Alumnas".</div>`;
-  } else { el.innerHTML=''; }
+  el.innerHTML=sinDias.length?`<div class="alert-banner"><i class="ti ti-alert-triangle"></i> ${sinDias.length} alumna${sinDias.length>1?'s':''} sin días asignados — no aparecen en la agenda hasta que les asignes días en "Alumnas".</div>`:'';
 }
 
 function updateMetrics(){
   document.getElementById('m-total').textContent=alumnas.length;
   document.getElementById('m-pendientes').textContent=alumnas.filter(a=>a.pago!=='al-dia').length;
   document.getElementById('m-disciplinas').textContent=disciplinas.length;
-  const mes=new Date().getMonth()+1,año=new Date().getFullYear();
-  const ing=finanzas.filter(f=>f.tipo==='ingreso'&&new Date(f.fecha).getMonth()+1===mes&&new Date(f.fecha).getFullYear()===año).reduce((s,f)=>s+Number(f.monto),0);
+  const mes=new Date().getMonth()+1,anio=new Date().getFullYear();
+  const ing=finanzas.filter(f=>f.tipo==='ingreso'&&new Date(f.fecha).getMonth()+1===mes&&new Date(f.fecha).getFullYear()===anio).reduce((s,f)=>s+Number(f.monto),0);
   document.getElementById('m-ingresos').textContent='$'+ing.toLocaleString();
 }
 
+/* ======= NOTIFICACIONES ======= */
 function buildNotifications(){
   const notifs=[];
-  alumnas.filter(a=>a.pago==='vencido').forEach(a=>{
-    notifs.push({type:'danger',icon:'ti-credit-card-off',name:a.nombre,msg:'Cuota vencida',tel:a.telefono,waMsg:`Hola ${a.nombre.split(' ')[0]}, te recordamos que tu cuota en ${centroData?.nombre||'el estudio'} está vencida. Por favor regularizá tu situación. ¡Gracias!`});
-  });
-  alumnas.filter(a=>a.pago==='pendiente').forEach(a=>{
-    notifs.push({type:'warning',icon:'ti-clock',name:a.nombre,msg:'Cuota pendiente de pago',tel:a.telefono,waMsg:`Hola ${a.nombre.split(' ')[0]}, te avisamos que tu cuota en ${centroData?.nombre||'el estudio'} está pendiente de pago. ¡Cualquier consulta estamos a disposición!`});
-  });
+  alumnas.filter(a=>a.pago==='vencido').forEach(a=>notifs.push({type:'danger',icon:'ti-credit-card-off',name:a.nombre,msg:'Cuota vencida',tel:a.telefono,waMsg:`Hola ${a.nombre.split(' ')[0]}, te recordamos que tu cuota en ${centroData?.nombre||'el estudio'} está vencida. Por favor regularizá tu situación. ¡Gracias!`}));
+  alumnas.filter(a=>a.pago==='pendiente').forEach(a=>notifs.push({type:'warning',icon:'ti-clock',name:a.nombre,msg:'Cuota pendiente de pago',tel:a.telefono,waMsg:`Hola ${a.nombre.split(' ')[0]}, te avisamos que tu cuota en ${centroData?.nombre||'el estudio'} está pendiente de pago.`}));
   alumnas.forEach(a=>{
     const ausencias=asistencias.filter(x=>x.alumna_id===a.id&&x.estado==='ausente').length;
-    if(ausencias>=3) notifs.push({type:'warning',icon:'ti-user-off',name:a.nombre,msg:`${ausencias} ausencias registradas`,tel:a.telefono,waMsg:`Hola ${a.nombre.split(' ')[0]}, notamos que tuviste varias ausencias últimamente. ¿Todo bien? Cualquier consulta contactanos. ¡Te esperamos!`});
+    if(ausencias>=3) notifs.push({type:'warning',icon:'ti-user-off',name:a.nombre,msg:`${ausencias} ausencias registradas`,tel:a.telefono,waMsg:`Hola ${a.nombre.split(' ')[0]}, notamos que tuviste varias ausencias últimamente. ¿Todo bien?`});
   });
   const badge=document.getElementById('notif-badge');
   const list=document.getElementById('notif-list');
-  if(notifs.length){badge.textContent=notifs.length;badge.classList.remove('hidden');}
-  else{badge.classList.add('hidden');}
-  if(!notifs.length){list.innerHTML='<div class="notif-empty"><i class="ti ti-check" style="font-size:24px;color:#1D9E75;display:block;margin-bottom:8px"></i>Sin notificaciones pendientes</div>';return;}
-  list.innerHTML=notifs.map(n=>`
+  if(notifs.length){badge.textContent=notifs.length;badge.classList.remove('hidden');}else{badge.classList.add('hidden');}
+  list.innerHTML=notifs.length?notifs.map(n=>`
     <div class="notif-item">
       <div class="notif-icon ${n.type==='danger'?'ni-danger':'ni-warning'}"><i class="ti ${n.icon}"></i></div>
       <div class="notif-text">
@@ -423,42 +467,28 @@ function buildNotifications(){
         <div class="notif-sub">${n.msg}</div>
         ${n.tel?`<button class="notif-wa" onclick="sendWA('${n.tel}','${encodeURIComponent(n.waMsg)}')"><i class="ti ti-brand-whatsapp"></i> Enviar WhatsApp</button>`:''}
       </div>
-    </div>`).join('');
+    </div>`).join(''):'<div class="notif-empty"><i class="ti ti-check" style="font-size:24px;color:#1D9E75;display:block;margin-bottom:8px"></i>Sin notificaciones pendientes</div>';
 }
-
-function sendWA(tel,msg){
-  const num=tel.replace(/\D/g,'');
-  window.open(`https://wa.me/54${num}?text=${msg}`,'_blank');
-}
-
-function toggleNotif(){
-  notifOpen=!notifOpen;
-  document.getElementById('notif-panel').classList.toggle('open',notifOpen);
-}
-
-document.addEventListener('click',function(e){
-  if(notifOpen&&!e.target.closest('#notif-panel')&&!e.target.closest('#notif-btn')){
-    notifOpen=false;document.getElementById('notif-panel').classList.remove('open');
-  }
+function sendWA(tel,msg){ window.open(`https://wa.me/54${tel.replace(/\D/g,'')}?text=${msg}`,'_blank'); }
+function toggleNotif(){ notifOpen=!notifOpen; document.getElementById('notif-panel').classList.toggle('open',notifOpen); }
+document.addEventListener('click',e=>{
+  if(notifOpen&&!e.target.closest('#notif-panel')&&!e.target.closest('#notif-btn')){notifOpen=false;document.getElementById('notif-panel').classList.remove('open');}
 });
 
+/* ======= AGENDA ======= */
 function buildDayTabs(){
-  const usedDays=new Set();
-  disciplinas.forEach(d=>(d.dias||[]).forEach(day=>usedDays.add(day)));
-  if(!usedDays.size) DAYS.slice(0,5).forEach(d=>usedDays.add(d.k));
-  const days=DAYS.filter(d=>usedDays.has(d.k));
+  const used=new Set();
+  disciplinas.forEach(d=>(d.dias||[]).forEach(x=>used.add(x)));
+  if(!used.size) DAYS.slice(0,5).forEach(d=>used.add(d.k));
+  const days=DAYS.filter(d=>used.has(d.k));
   ['agenda','asist'].forEach(type=>{
-    const el=document.getElementById('day-tabs-'+type);
-    el.innerHTML=days.map((d,i)=>`<button class="day-tab${i===0?' active':''}" onclick="show${type==='agenda'?'Day':'AsistDay'}('${d.k}',this)">${d.l}</button>`).join('');
+    document.getElementById('day-tabs-'+type).innerHTML=days.map((d,i)=>`<button class="day-tab${i===0?' active':''}" onclick="show${type==='agenda'?'Day':'AsistDay'}('${d.k}',this)">${d.l}</button>`).join('');
   });
-  if(days.length) currentDay=days[0].k;
+  if(days.length){ currentDay=days[0].k; currentAsistDay=days[0].k; }
 }
-
-// Alumna corresponde a un día = tiene ese día asignado en su array `dias`
 function alumnasDeSlot(discId,turno,day){
-  return alumnas.filter(a=>a.disciplina_id===discId && a.turno===turno && (a.dias||[]).includes(day));
+  return alumnas.filter(a=>a.disciplina_id===discId&&a.turno===turno&&(a.dias||[]).includes(day));
 }
-
 function renderAgenda(day){
   currentDay=day;
   const c=document.getElementById('slots-container');
@@ -468,40 +498,30 @@ function renderAgenda(day){
   dayDiscs.forEach(disc=>{
     (disc.turnos||[]).forEach(turno=>{
       const ins=alumnasDeSlot(disc.id,turno,day);
-      const cap=disc.capacidad||3;const libre=cap-ins.length;
+      const cap=disc.capacidad||3,libre=cap-ins.length;
       let cuposHTML='';
       for(let i=0;i<cap;i++){const a=ins[i];cuposHTML+=`<div class="cupo ${a?'ocupado':'libre'}" title="${a?a.nombre:'Libre'}">${a?initials(a.nombre):'+'}</div>`;}
       const alHTML=ins.map(a=>`<span class="alumna-chip">${a.nombre.split(' ')[0]}</span>`).join('');
       const div=document.createElement('div');div.className='slot';
       div.innerHTML=`
-        <div class="slot-header">
-          <div class="slot-time"><i class="ti ti-clock"></i> ${turno} hs</div>
-          <span class="slot-type" style="background:${disc.color||'#0F6E56'}">${disc.nombre}</span>
-        </div>
+        <div class="slot-header"><div class="slot-time"><i class="ti ti-clock"></i> ${turno} hs</div><span class="slot-type" style="background:${disc.color||'#0F6E56'}">${disc.nombre}</span></div>
         <div class="cupos-bar">${cuposHTML}<span class="cupo-label">${libre} lugar${libre!==1?'es':''} libre${libre!==1?'s':''}</span></div>
         <div class="alumnas-list">${alHTML||'<span style="font-size:12px;color:#aaa">Sin alumnas asignadas este día</span>'}</div>
-        <div class="slot-footer">
-          <span class="libre-count"><span>${ins.length}</span>/${cap} ocupados</span>
-          ${libre>0?`<button class="add-btn" onclick="openModal('alumna')"><i class="ti ti-plus"></i> Agregar alumna</button>`:'<span style="font-size:11px;color:#993C1D;font-weight:500">Turno completo</span>'}
-        </div>`;
+        <div class="slot-footer"><span class="libre-count"><span>${ins.length}</span>/${cap} ocupados</span>${libre>0?`<button class="add-btn" onclick="openModal('alumna')"><i class="ti ti-plus"></i> Agregar alumna</button>`:'<span style="font-size:11px;color:#993C1D;font-weight:500">Turno completo</span>'}</div>`;
       c.appendChild(div);
     });
   });
 }
+function showDay(day,btn){document.querySelectorAll('#day-tabs-agenda .day-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAgenda(day);}
 
-function showDay(day,btn){
-  document.querySelectorAll('#day-tabs-agenda .day-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');renderAgenda(day);
-}
-
+/* ======= ALUMNAS ======= */
 function renderAlumnas(){
   const pLabel={'al-dia':'Al día',pendiente:'Pendiente',vencido:'Vencido'};
   const pClass={'al-dia':'sb-al-dia',pendiente:'sb-pendiente',vencido:'sb-vencido'};
   let list=alumnas;
   if(currentFilter==='pendiente') list=alumnas.filter(a=>a.pago!=='al-dia');
   else if(currentFilter!=='todas'){const disc=disciplinas.find(d=>d.id===currentFilter);if(disc)list=alumnas.filter(a=>a.disciplina_id===disc.id);}
-  const filterRow=document.getElementById('filter-row');
-  filterRow.innerHTML=`<button class="filter-btn${currentFilter==='todas'?' active':''}" onclick="setFilter('todas',this)">Todas</button>`+
+  document.getElementById('filter-row').innerHTML=`<button class="filter-btn${currentFilter==='todas'?' active':''}" onclick="setFilter('todas',this)">Todas</button>`+
     disciplinas.map(d=>`<button class="filter-btn${currentFilter===d.id?' active':''}" onclick="setFilter('${d.id}',this)">${d.nombre}</button>`).join('')+
     `<button class="filter-btn${currentFilter==='pendiente'?' active':''}" onclick="setFilter('pendiente',this)">Cuota pendiente</button>`;
   const grid=document.getElementById('alumna-grid');
@@ -510,8 +530,7 @@ function renderAlumnas(){
   grid.innerHTML=list.map(a=>{
     const dias=a.dias||[];
     const diasHTML=dias.length?dias.map(d=>`<span class="dia-tag">${DAY_LABEL[d]||d}</span>`).join(''):(a.disciplina_id?'<span class="dia-tag warn">Sin días asignados</span>':'');
-    return`
-    <div class="alumna-row">
+    return`<div class="alumna-row">
       <div class="av">${initials(a.nombre)}</div>
       <div class="alumna-info">
         <div class="alumna-name">${a.nombre}</div>
@@ -525,51 +544,48 @@ function renderAlumnas(){
     </div>`;
   }).join('');
 }
-
-function setFilter(f,btn){
-  currentFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');renderAlumnas();
-}
+function setFilter(f,btn){currentFilter=f;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAlumnas();}
 
 async function togglePago(id){
   const a=alumnas.find(x=>x.id===id);if(!a)return;
   const cycle={'al-dia':'pendiente',pendiente:'vencido',vencido:'al-dia'};
+  const prev=a.pago;
   a.pago=cycle[a.pago];
-  await sb.from('alumnas').update({pago:a.pago}).eq('id',id);
-  toast(`${a.nombre.split(' ')[0]} — ${a.pago==='al-dia'?'al día':a.pago}`,'ok');
   renderAlumnas();renderCuotas();updateMetrics();buildNotifications();
+  const{error}=await sb.from('alumnas').update({pago:a.pago}).eq('id',id);
+  if(error){ a.pago=prev; logErr('togglePago',error); toast('No se pudo actualizar el pago','err'); renderAlumnas();renderCuotas();updateMetrics();buildNotifications(); return; }
+  toast(`${a.nombre.split(' ')[0]} — ${a.pago==='al-dia'?'al día':a.pago}`,'ok');
 }
 
 async function deleteAlumna(id){
   if(!confirm('¿Eliminar esta alumna?'))return;
-  await sb.from('alumnas').delete().eq('id',id);
+  const{error}=await sb.from('alumnas').delete().eq('id',id);
+  if(error){logErr('deleteAlumna',error);toast('No se pudo eliminar','err');return;}
   alumnas=alumnas.filter(a=>a.id!==id);
   toast('Alumna eliminada');renderAlumnas();updateMetrics();renderAgenda(currentDay);buildNotifications();checkAlumnasSinDias();
 }
 
+/* ======= DISCIPLINAS ======= */
 function renderDisciplinas(){
   const grid=document.getElementById('disc-grid');
   if(!disciplinas.length){grid.innerHTML='<div class="empty-state"><i class="ti ti-yoga"></i><p>No hay disciplinas creadas todavía.</p></div>';return;}
   grid.innerHTML=disciplinas.map(d=>`
     <div class="disc-row">
       <div class="disc-color" style="background:${d.color||'#0F6E56'}"></div>
-      <div class="disc-info">
-        <div class="disc-name">${d.nombre}</div>
-        <div class="disc-sub">Capacidad: ${d.capacidad} · Días: ${(d.dias||[]).map(x=>DAY_LABEL[x]||x).join(', ')} · Turnos: ${(d.turnos||[]).join(', ')} hs</div>
-      </div>
+      <div class="disc-info"><div class="disc-name">${d.nombre}</div><div class="disc-sub">Capacidad: ${d.capacidad} · Días: ${(d.dias||[]).map(x=>DAY_LABEL[x]||x).join(', ')} · Turnos: ${(d.turnos||[]).join(', ')} hs</div></div>
       <button class="icon-btn" onclick="openModal('disciplina','${d.id}')"><i class="ti ti-edit"></i></button>
       <button class="icon-btn danger" onclick="deleteDisciplina('${d.id}')"><i class="ti ti-trash"></i></button>
     </div>`).join('');
 }
-
 async function deleteDisciplina(id){
-  if(!confirm('¿Eliminar esta disciplina?'))return;
-  await sb.from('disciplinas').delete().eq('id',id);
+  if(!confirm('¿Eliminar esta disciplina? Las alumnas asignadas quedarán sin disciplina.'))return;
+  const{error}=await sb.from('disciplinas').delete().eq('id',id);
+  if(error){logErr('deleteDisciplina',error);toast('No se pudo eliminar','err');return;}
   disciplinas=disciplinas.filter(d=>d.id!==id);
   toast('Disciplina eliminada');renderDisciplinas();renderAgenda(currentDay);updateMetrics();buildDayTabs();
 }
 
+/* ======= ASISTENCIAS ======= */
 function renderAsistencias(day){
   currentAsistDay=day;
   const c=document.getElementById('asist-container');
@@ -587,18 +603,13 @@ function renderAsistencias(day){
         const st=reg?.estado||'sin';
         return `<span class="asist-chip ${st==='asistio'?'asistio':st==='ausente'?'ausente':''}" onclick="toggleAsist('${a.id}','${turno}','${a.nombre}')">${a.nombre.split(' ')[0]}</span>`;
       }).join('');
-      div.innerHTML=`
-        <div class="slot-header">
-          <div class="slot-time"><i class="ti ti-clock"></i> ${turno} hs</div>
-          <span class="slot-type" style="background:${disc.color||'#0F6E56'}">${disc.nombre}</span>
-        </div>
+      div.innerHTML=`<div class="slot-header"><div class="slot-time"><i class="ti ti-clock"></i> ${turno} hs</div><span class="slot-type" style="background:${disc.color||'#0F6E56'}">${disc.nombre}</span></div>
         <div style="font-size:11px;color:#888;margin-bottom:8px">Tocá una alumna para marcar presencia</div>
         <div class="alumnas-list">${chips}</div>`;
       c.appendChild(div);
     });
   });
 }
-
 async function toggleAsist(alumnaId,turno,nombre){
   const hoy=new Date().toISOString().slice(0,10);
   const idx=asistencias.findIndex(x=>x.alumna_id===alumnaId&&x.fecha===hoy&&x.turno===turno);
@@ -606,20 +617,18 @@ async function toggleAsist(alumnaId,turno,nombre){
   const cur=idx>=0?asistencias[idx].estado:'sin';
   const next=cycle[cur];
   if(idx>=0){
+    const{error}=await sb.from('asistencias').update({estado:next}).eq('id',asistencias[idx].id);
+    if(error){logErr('toggleAsist-update',error);toast('No se pudo guardar la asistencia','err');return;}
     asistencias[idx].estado=next;
-    await sb.from('asistencias').update({estado:next}).eq('id',asistencias[idx].id);
   } else {
-    const{data}=await sb.from('asistencias').insert({centro_id:currentUser.id,alumna_id:alumnaId,fecha:hoy,turno,estado:next}).select().single();
+    const{data,error}=await sb.from('asistencias').insert({centro_id:currentUser.id,alumna_id:alumnaId,fecha:hoy,turno,estado:next}).select().maybeSingle();
+    if(error){logErr('toggleAsist-insert',error);toast('No se pudo guardar la asistencia','err');return;}
     if(data) asistencias.push(data);
   }
-  toast(`${nombre.split(' ')[0]} — ${next==='asistio'?'presente ✓':next==='ausente'?'ausente':'sin marcar'}`);
-  renderAsistencias(currentAsistDay);buildNotifications();
+  toast(`${nombre.split(' ')[0]} — ${next==='asistio'?'presente':next==='ausente'?'ausente':'sin marcar'}`);
+  renderAsistencias(currentAsistDay);buildStats();buildNotifications();
 }
-
-function showAsistDay(day,btn){
-  document.querySelectorAll('#day-tabs-asist .day-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');renderAsistencias(day);
-}
+function showAsistDay(day,btn){document.querySelectorAll('#day-tabs-asist .day-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderAsistencias(day);}
 
 function buildStats(){
   const el=document.getElementById('stats-asist');
@@ -633,9 +642,10 @@ function buildStats(){
   el.innerHTML=`<div class="stat-card"><div class="stat-title">Asistencia por disciplina</div>${byDisc.map(d=>`<div class="bar-row"><div class="bar-label">${d.nombre}</div><div class="bar-track"><div class="bar-fill" style="width:${d.pct}%;background:${d.color}"></div></div><div class="bar-val">${d.pct}%</div></div>`).join('')}</div>`;
 }
 
+/* ======= FINANZAS ======= */
 function renderFinanzas(){
-  const mes=new Date().getMonth()+1,año=new Date().getFullYear();
-  const mesF=finanzas.filter(f=>new Date(f.fecha).getMonth()+1===mes&&new Date(f.fecha).getFullYear()===año);
+  const mes=new Date().getMonth()+1,anio=new Date().getFullYear();
+  const mesF=finanzas.filter(f=>new Date(f.fecha).getMonth()+1===mes&&new Date(f.fecha).getFullYear()===anio);
   const ing=mesF.filter(f=>f.tipo==='ingreso').reduce((s,f)=>s+Number(f.monto),0);
   const gas=mesF.filter(f=>f.tipo==='gasto').reduce((s,f)=>s+Number(f.monto),0);
   document.getElementById('fin-metrics').innerHTML=`
@@ -651,28 +661,24 @@ function renderFinanzas(){
     const alumnaName=f.alumna_id&&alumnaMap[f.alumna_id]?alumnaMap[f.alumna_id].nombre.split(' ')[0]:'';
     return`<div class="fin-item">
       <div class="fin-icon ${f.tipo}"><i class="ti ti-${f.tipo==='ingreso'?'arrow-up':'arrow-down'}"></i></div>
-      <div class="fin-info">
-        <div class="fin-desc">${f.descripcion}${alumnaName?' · '+alumnaName:''}</div>
-        <div class="fin-fecha">${f.fecha} ${f.tipo==='ingreso'?`· <span class="metodo-badge ${metodoClass}">${metodoLabel}</span>`:''}</div>
-      </div>
+      <div class="fin-info"><div class="fin-desc">${f.descripcion}${alumnaName?' · '+alumnaName:''}</div><div class="fin-fecha">${f.fecha} ${f.tipo==='ingreso'?`· <span class="metodo-badge ${metodoClass}">${metodoLabel}</span>`:''}</div></div>
       <div class="fin-val ${f.tipo==='ingreso'?'ing':'gasto'}">${f.tipo==='ingreso'?'+':'-'}$${Number(f.monto).toLocaleString()}</div>
       <button class="icon-btn danger" onclick="deleteFinanza('${f.id}')"><i class="ti ti-trash"></i></button>
     </div>`;
   }).join('');
 }
-
 async function deleteFinanza(id){
   if(!confirm('¿Eliminar este movimiento?'))return;
-  await sb.from('finanzas').delete().eq('id',id);
+  const{error}=await sb.from('finanzas').delete().eq('id',id);
+  if(error){logErr('deleteFinanza',error);toast('No se pudo eliminar','err');return;}
   finanzas=finanzas.filter(f=>f.id!==id);
   renderFinanzas();updateMetrics();
 }
-
 function renderCuotas(){
   const pLabel={'al-dia':'Al día',pendiente:'Pendiente',vencido:'Vencido'};
   const pClass={'al-dia':'sb-al-dia',pendiente:'sb-pendiente',vencido:'sb-vencido'};
   const discMap={};disciplinas.forEach(d=>discMap[d.id]=d);
-  const sorted=[...alumnas].sort((a,b)=>{const o={vencido:0,pendiente:1,'al-dia':2};return(o[a.pago]||1)-(o[b.pago]||1)});
+  const sorted=[...alumnas].sort((a,b)=>{const o={vencido:0,pendiente:1,'al-dia':2};return(o[a.pago]??1)-(o[b.pago]??1)});
   document.getElementById('cuotas-list').innerHTML=sorted.map(a=>`
     <div class="alumna-row">
       <div class="av">${initials(a.nombre)}</div>
@@ -682,6 +688,7 @@ function renderCuotas(){
     </div>`).join('');
 }
 
+/* ======= PERFIL ======= */
 function loadPerfilForm(){
   if(!centroData)return;
   document.getElementById('p-nombre').value=centroData.nombre||'';
@@ -689,50 +696,34 @@ function loadPerfilForm(){
   document.getElementById('p-tel').value=centroData.telefono||'';
   document.getElementById('p-dir').value=centroData.direccion||'';
   document.getElementById('p-bio').value=centroData.bio||'';
-  const logo=document.getElementById('perfil-logo-preview');
-  if(centroData.logo_url){logo.innerHTML=`<img src="${centroData.logo_url}" alt="logo">`;}
-  else{logo.textContent=initials(centroData.nombre||'MI');}
 }
-
-function previewLogo(input){
-  if(!input.files||!input.files[0])return;
-  const reader=new FileReader();
-  reader.onload=e=>{document.getElementById('perfil-logo-preview').innerHTML=`<img src="${e.target.result}" alt="logo">`;};
-  reader.readAsDataURL(input.files[0]);
-}
-
 async function savePerfil(){
   const nombre=document.getElementById('p-nombre').value.trim();
   if(!nombre){toast('El nombre es obligatorio','err');return;}
+  setBtnLoading('btn-perfil',true);
   const updates={nombre,email:document.getElementById('p-email').value.trim(),telefono:document.getElementById('p-tel').value.trim(),direccion:document.getElementById('p-dir').value.trim(),bio:document.getElementById('p-bio').value.trim()};
-  try{
-    const logoFile=document.getElementById('logo-input').files?.[0];
-    if(logoFile){
-      const ext=logoFile.name.split('.').pop();
-      const path=`logos/${currentUser.id}.${ext}`;
-      const{error:upErr}=await sb.storage.from('logos').upload(path,logoFile,{upsert:true});
-      if(!upErr){const{data:urlData}=sb.storage.from('logos').getPublicUrl(path);updates.logo_url=urlData.publicUrl;}
-    }
-  }catch(e){}
   const{error}=await sb.from('centros').update(updates).eq('id',currentUser.id);
-  if(error){toast('Error al guardar','err');return;}
+  setBtnLoading('btn-perfil',false,'<i class="ti ti-check"></i> Guardar cambios');
+  if(error){logErr('savePerfil',error);toast('Error al guardar','err');return;}
   centroData={...centroData,...updates};
   document.getElementById('centro-name').textContent=nombre;
   toast('Perfil actualizado','ok');
 }
-
 async function savePassword(){
   const pass=document.getElementById('p-pass').value;
   const pass2=document.getElementById('p-pass2').value;
   if(!pass||!pass2){toast('Completá ambos campos','err');return;}
   if(pass!==pass2){toast('Las contraseñas no coinciden','err');return;}
   if(pass.length<6){toast('Mínimo 6 caracteres','err');return;}
+  setBtnLoading('btn-pass',true);
   const{error}=await sb.auth.updateUser({password:pass});
-  if(error){toast('Error: '+error.message,'err');return;}
+  setBtnLoading('btn-pass',false,'<i class="ti ti-lock"></i> Cambiar contraseña');
+  if(error){logErr('savePassword',error);toast('Error: '+error.message,'err');return;}
   toast('Contraseña actualizada','ok');
   document.getElementById('p-pass').value='';document.getElementById('p-pass2').value='';
 }
 
+/* ======= NAVEGACIÓN ======= */
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -743,6 +734,7 @@ function showScreen(id){
   if(id==='perfil') loadPerfilForm();
 }
 
+/* ======= MODALES ======= */
 function openModal(type,id=null){
   editingId=id;
   document.getElementById('modal-overlay').classList.add('open');
@@ -752,74 +744,69 @@ function openModal(type,id=null){
   if(type==='finanza') content.innerHTML=buildFinanzaModal();
 }
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
 
 function buildAlumnaModal(id){
   const a=id?alumnas.find(x=>x.id===id):null;
   const discOpts=disciplinas.map(d=>`<option value="${d.id}" ${a?.disciplina_id===d.id?'selected':''}>${d.nombre}</option>`).join('');
-  const turnoOpts=(a?disciplinas.find(d=>d.id===a.disciplina_id)?.turnos||[]:disciplinas[0]?.turnos||[]).map(t=>`<option ${a?.turno===t?'selected':''}>${t}</option>`).join('');
   const discSel=a?disciplinas.find(d=>d.id===a.disciplina_id):disciplinas[0];
-  const diasDisponibles=discSel?.dias||['lun','mar','mie','jue','vie','sab'];
+  const turnoOpts=(discSel?.turnos||[]).map(t=>`<option ${a?.turno===t?'selected':''}>${t}</option>`).join('');
+  const diasDisponibles=discSel?.dias?.length?discSel.dias:['lun','mar','mie','jue','vie','sab'];
   const diasHTML=diasDisponibles.map(day=>`<label><input type="checkbox" value="${day}" ${(a?.dias||[]).includes(day)?'checked':''}> <span>${DAY_LABEL[day]||day}</span></label>`).join('');
   return`<div class="modal-title"><i class="ti ti-${a?'edit':'user-plus'}"></i> ${a?'Editar':'Nueva'} alumna</div>
     <div class="form-group"><label class="form-label">Nombre completo</label><input type="text" id="f-nombre" value="${a?.nombre||''}" placeholder="Ej: María González"></div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Disciplina</label><select id="f-disc" onchange="updateTurnosYDias()">${discOpts||'<option value="">Sin disciplinas</option>'}</select></div>
+      <div class="form-group"><label class="form-label">Disciplina</label><select id="f-disc" onchange="updateTurnosYDias()">${discOpts||'<option value="">Creá una disciplina primero</option>'}</select></div>
       <div class="form-group"><label class="form-label">Turno</label><select id="f-turno">${turnoOpts}</select></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Días que asiste a este turno</label>
-      <div class="dias-check-grid" id="f-dias-grid">${diasHTML}</div>
-    </div>
+    <div class="form-group"><label class="form-label">Días que asiste a este turno</label><div class="dias-check-grid" id="f-dias-grid">${diasHTML}</div></div>
     <div class="form-group"><label class="form-label">Teléfono WhatsApp</label><input type="text" id="f-tel" value="${a?.telefono||''}" placeholder="Ej: 351 123-4567"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Cuota mensual ($)</label><input type="number" id="f-cuota" value="${a?.cuota||''}" placeholder="0"></div>
       <div class="form-group"><label class="form-label">Estado de pago</label><select id="f-pago"><option value="al-dia" ${a?.pago==='al-dia'?'selected':''}>Al día</option><option value="pendiente" ${a?.pago==='pendiente'?'selected':''}>Pendiente</option><option value="vencido" ${a?.pago==='vencido'?'selected':''}>Vencido</option></select></div>
     </div>
-    <button class="btn-primary" onclick="saveAlumna()"><i class="ti ti-check"></i> Guardar</button>
+    <button class="btn-primary" id="btn-save-alumna" onclick="saveAlumna()"><i class="ti ti-check"></i> Guardar</button>
     <button class="btn-secondary" onclick="closeModal()">Cancelar</button>`;
 }
-
 function updateTurnosYDias(){
   const discId=document.getElementById('f-disc')?.value;
   const disc=disciplinas.find(d=>d.id===discId);
   const selTurno=document.getElementById('f-turno');
   if(selTurno) selTurno.innerHTML=(disc?.turnos||[]).map(t=>`<option>${t}</option>`).join('');
   const diasGrid=document.getElementById('f-dias-grid');
-  const diasDisponibles=disc?.dias||['lun','mar','mie','jue','vie','sab'];
+  const diasDisponibles=disc?.dias?.length?disc.dias:['lun','mar','mie','jue','vie','sab'];
   if(diasGrid) diasGrid.innerHTML=diasDisponibles.map(day=>`<label><input type="checkbox" value="${day}"> <span>${DAY_LABEL[day]||day}</span></label>`).join('');
 }
-
 async function saveAlumna(){
   const nombre=document.getElementById('f-nombre').value.trim();
   if(!nombre){toast('Ingresá el nombre','err');return;}
   const dias=Array.from(document.querySelectorAll('#f-dias-grid input[type=checkbox]:checked')).map(c=>c.value);
-  const data={centro_id:currentUser.id,nombre,
-    disciplina_id:document.getElementById('f-disc')?.value||null,
+  const discVal=document.getElementById('f-disc')?.value||null;
+  const data={
+    centro_id:currentUser.id,
+    nombre,
+    disciplina_id:discVal||null,
     turno:document.getElementById('f-turno')?.value||null,
     dias,
     telefono:document.getElementById('f-tel').value.trim()||null,
     cuota:parseFloat(document.getElementById('f-cuota').value)||0,
-    pago:document.getElementById('f-pago').value};
-  if(editingId){
-    const{error}=await sb.from('alumnas').update(data).eq('id',editingId);
-    if(error){toast('Error al guardar','err');return;}
-    const idx=alumnas.findIndex(a=>a.id===editingId);
-    if(idx>=0) alumnas[idx]={...alumnas[idx],...data};
-    toast(`${nombre.split(' ')[0]} actualizada`,'ok');
-  } else {
-    const{data:nd,error}=await sb.from('alumnas').insert(data).select().single();
-    if(error){toast('Error al guardar','err');return;}
-    if(nd) alumnas.push(nd);
-    toast(`${nombre.split(' ')[0]} agregada`,'ok');
-  }
+    pago:document.getElementById('f-pago').value
+  };
+  setBtnLoading('btn-save-alumna',true);
+  let res;
+  if(editingId) res=await sb.from('alumnas').update(data).eq('id',editingId).select().maybeSingle();
+  else res=await sb.from('alumnas').insert(data).select().maybeSingle();
+  setBtnLoading('btn-save-alumna',false,'<i class="ti ti-check"></i> Guardar');
+  if(res.error){ logErr('saveAlumna',res.error); toast('Error al guardar: '+res.error.message,'err'); return; }
+  if(editingId){ const idx=alumnas.findIndex(a=>a.id===editingId); if(idx>=0) alumnas[idx]=res.data||{...alumnas[idx],...data}; toast(`${nombre.split(' ')[0]} actualizada`,'ok'); }
+  else { if(res.data) alumnas.push(res.data); toast(`${nombre.split(' ')[0]} agregada`,'ok'); }
   closeModal();renderAlumnas();renderAgenda(currentDay);updateMetrics();buildNotifications();checkAlumnasSinDias();
 }
 
 function buildDisciplinaModal(id){
   const d=id?disciplinas.find(x=>x.id===id):null;
   const daysList=['lun','mar','mie','jue','vie','sab'];
-  const dayLabelFull={lun:'Lunes',mar:'Martes',mie:'Miércoles',jue:'Jueves',vie:'Viernes',sab:'Sábado'};
-  const diasHTML=daysList.map(day=>`<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" value="${day}" ${(d?.dias||[]).includes(day)?'checked':''}> ${dayLabelFull[day]}</label>`).join('');
+  const diasHTML=daysList.map(day=>`<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" value="${day}" ${(d?.dias||[]).includes(day)?'checked':''}> ${DAY_LABEL_FULL[day]}</label>`).join('');
   return`<div class="modal-title"><i class="ti ti-${d?'edit':'plus'}"></i> ${d?'Editar':'Nueva'} disciplina</div>
     <div class="form-group"><label class="form-label">Nombre</label><input type="text" id="d-nombre" value="${d?.nombre||''}" placeholder="Ej: Pilates Reformer"></div>
     <div class="form-row">
@@ -828,28 +815,23 @@ function buildDisciplinaModal(id){
     </div>
     <div class="form-group"><label class="form-label">Días en que se dicta</label><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${diasHTML}</div></div>
     <div class="form-group"><label class="form-label">Turnos (separados por coma)</label><input type="text" id="d-turnos" value="${(d?.turnos||[]).join(', ')}" placeholder="Ej: 08:00, 13:15, 17:00"></div>
-    <button class="btn-primary" onclick="saveDisciplina()"><i class="ti ti-check"></i> Guardar</button>
+    <button class="btn-primary" id="btn-save-disc" onclick="saveDisciplina()"><i class="ti ti-check"></i> Guardar</button>
     <button class="btn-secondary" onclick="closeModal()">Cancelar</button>`;
 }
-
 async function saveDisciplina(){
   const nombre=document.getElementById('d-nombre').value.trim();
   if(!nombre){toast('Ingresá el nombre','err');return;}
   const dias=Array.from(document.querySelectorAll('#modal-content input[type=checkbox]:checked')).map(c=>c.value);
   const turnos=document.getElementById('d-turnos').value.split(',').map(t=>t.trim()).filter(Boolean);
   const data={centro_id:currentUser.id,nombre,capacidad:parseInt(document.getElementById('d-cap').value)||3,color:document.getElementById('d-color').value,dias,turnos};
-  if(editingId){
-    const{error}=await sb.from('disciplinas').update(data).eq('id',editingId);
-    if(error){toast('Error al guardar','err');return;}
-    const idx=disciplinas.findIndex(d=>d.id===editingId);
-    if(idx>=0) disciplinas[idx]={...disciplinas[idx],...data};
-    toast('Disciplina actualizada','ok');
-  } else {
-    const{data:nd,error}=await sb.from('disciplinas').insert(data).select().single();
-    if(error){toast('Error al guardar','err');return;}
-    if(nd) disciplinas.push(nd);
-    toast('Disciplina creada','ok');
-  }
+  setBtnLoading('btn-save-disc',true);
+  let res;
+  if(editingId) res=await sb.from('disciplinas').update(data).eq('id',editingId).select().maybeSingle();
+  else res=await sb.from('disciplinas').insert(data).select().maybeSingle();
+  setBtnLoading('btn-save-disc',false,'<i class="ti ti-check"></i> Guardar');
+  if(res.error){ logErr('saveDisciplina',res.error); toast('Error al guardar: '+res.error.message,'err'); return; }
+  if(editingId){ const idx=disciplinas.findIndex(d=>d.id===editingId); if(idx>=0) disciplinas[idx]=res.data||{...disciplinas[idx],...data}; toast('Disciplina actualizada','ok'); }
+  else { if(res.data) disciplinas.push(res.data); toast('Disciplina creada','ok'); }
   closeModal();renderDisciplinas();buildDayTabs();renderAgenda(currentDay);updateMetrics();
 }
 
@@ -858,7 +840,7 @@ function buildFinanzaModal(){
   return`<div class="modal-title"><i class="ti ti-report-money"></i> Registrar movimiento</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Tipo</label><select id="fin-tipo" onchange="toggleMetodo()"><option value="ingreso">Ingreso</option><option value="gasto">Gasto</option></select></div>
-      <div class="form-group"><label class="form-label">Método de pago</label><select id="fin-metodo"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option></select></div>
+      <div class="form-group" id="fin-metodo-group"><label class="form-label">Método de pago</label><select id="fin-metodo"><option value="efectivo">Efectivo</option><option value="transferencia">Transferencia</option></select></div>
     </div>
     <div class="form-group" id="fin-alumna-group"><label class="form-label">Alumna (opcional)</label><select id="fin-alumna"><option value="">— Sin alumna —</option>${alumnaOpts}</select></div>
     <div class="form-group"><label class="form-label">Descripción / Concepto</label><input type="text" id="fin-desc" placeholder="Ej: Cuota junio · Alquiler · Insumos"></div>
@@ -866,30 +848,29 @@ function buildFinanzaModal(){
       <div class="form-group"><label class="form-label">Importe ($)</label><input type="number" id="fin-monto" placeholder="0"></div>
       <div class="form-group"><label class="form-label">Fecha</label><input type="date" id="fin-fecha" value="${new Date().toISOString().slice(0,10)}"></div>
     </div>
-    <button class="btn-primary" onclick="saveFinanza()"><i class="ti ti-check"></i> Guardar</button>
+    <button class="btn-primary" id="btn-save-fin" onclick="saveFinanza()"><i class="ti ti-check"></i> Guardar</button>
     <button class="btn-secondary" onclick="closeModal()">Cancelar</button>`;
 }
-
 function toggleMetodo(){
   const tipo=document.getElementById('fin-tipo')?.value;
-  const metodoGroup=document.getElementById('fin-metodo')?.closest('.form-group');
-  if(metodoGroup) metodoGroup.style.display=tipo==='gasto'?'none':'block';
+  const g=document.getElementById('fin-metodo-group');
+  if(g) g.style.display=tipo==='gasto'?'none':'block';
 }
-
 async function saveFinanza(){
   const desc=document.getElementById('fin-desc').value.trim();
   const monto=parseFloat(document.getElementById('fin-monto').value);
   if(!desc||!monto){toast('Completá descripción e importe','err');return;}
   const tipo=document.getElementById('fin-tipo').value;
   const data={centro_id:currentUser.id,tipo,descripcion:desc,monto,fecha:document.getElementById('fin-fecha').value,metodo_pago:tipo==='ingreso'?document.getElementById('fin-metodo').value:'efectivo',alumna_id:document.getElementById('fin-alumna').value||null};
-  const{data:nd,error}=await sb.from('finanzas').insert(data).select().single();
-  if(error){toast('Error al guardar','err');return;}
+  setBtnLoading('btn-save-fin',true);
+  const{data:nd,error}=await sb.from('finanzas').insert(data).select().maybeSingle();
+  setBtnLoading('btn-save-fin',false,'<i class="ti ti-check"></i> Guardar');
+  if(error){ logErr('saveFinanza',error); toast('Error al guardar: '+error.message,'err'); return; }
   if(nd) finanzas.unshift(nd);
   closeModal();toast('Movimiento guardado','ok');renderFinanzas();updateMetrics();
 }
 
-document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
-
+/* ======= SESIÓN ======= */
 sb.auth.onAuthStateChange(async(event,session)=>{
   if(session?.user){
     currentUser=session.user;
